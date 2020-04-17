@@ -15,14 +15,13 @@ Including another URLconf
 """
 from django.conf.urls import include
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
 from hello_app import views
 
 urlpatterns = [
-    #path('', views.index, name='index'),
-
-    path('first_app/', include('hello_app.urls')),
-
-
+    re_path('^$', views.index, name='index'),
+    path('hello_app/', include('hello_app.urls')),
+    path('basic_dash/', include('basic_dash.urls')),
     path('admin/', admin.site.urls),
+    path('django_plotly_dash/', include('django_plotly_dash.urls'),name='the_django_plotly_dash'),
 ]

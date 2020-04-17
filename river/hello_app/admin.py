@@ -1,3 +1,8 @@
-from django.contrib import admin
+__author__ = 'SGV'
 
-# Register your models here.
+from django.contrib import admin
+from .models import (AccessRecord, Webpage, UserProfileInfo
+                              )
+admin.site.register(AccessRecord)
+admin.site.register(Webpage)
+admin.site.register(UserProfileInfo)
