@@ -7,14 +7,11 @@
 {% block content %}
  <div class="">
     <div class="container">
-        <div class="row" ><h1>Titulo Viejo</h1></div>
-        <div class="cl" >
-            {%if app %}
-              {% plotly_app name="simple_example"  ratio=.5 %}
-            {%else %}
-              <p>We couldn't load the View. Please check.</p>
-            {% endif %}
-        </div>
+        {%if app %}
+          {% plotly_app name=app_name ratio=1 %}
+        {%else %}
+          <p>We couldn't load the View. Please check.</p>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

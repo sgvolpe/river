@@ -11,10 +11,14 @@ def index(request):
     return HttpResponse('Basic Dash')
 
 def simple_example(request):
-    if DEBUG: print ('basic dash')
+    return render(request, 'basic_dash/simple_example.html', context={'app': app.get_simple_example(), 'app_name': 'simple_example'})
 
-    return render(request, 'basic_dash/simple_example.html', context={'app': app.get_simple_example()})
-    return HttpResponse('simple')
+def app2(request):
+    return render(request, 'basic_dash/simple_example.html', context={'app': app.get_app2(), 'app_name': 'app2'})
+
+def stock_app(request):
+    return render(request, 'basic_dash/simple_example.html', context={'app': app.get_stock_app(), 'app_name': 'stock_app'})
+
 
 
 
