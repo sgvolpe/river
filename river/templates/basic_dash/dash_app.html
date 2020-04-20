@@ -1,0 +1,17 @@
+
+{% extends 'hello_app/base.html' %}
+{% load bootstrap4 %}
+{% load static %}
+{% load plotly_dash %}
+
+{% block content %}
+ <div class="">
+
+        {%if app %}
+          {% plotly_app name=app_name ratio=1 %}
+        {%else %}
+          <p>We couldn't load the View. Please check.</p>
+        {% endif %}
+
+</div>
+{% endblock %}

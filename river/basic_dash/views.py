@@ -20,5 +20,17 @@ def stock_app(request):
     return render(request, 'basic_dash/simple_example.html', context={'app': app.get_stock_app(), 'app_name': 'stock_app'})
 
 
+def live_app(request):
+    return render(request, 'basic_dash/simple_example.html', context={'app': app.get_live_app(), 'app_name': 'live_app'})
+
+def analys_df_app(request):
+    return render(request, 'basic_dash/simple_example.html', context={'app': app.get_analys_df_app(), 'app_name': 'analys_df_app'})
+
+
+def render_app(request, app_name):
+    return render(request, 'basic_dash/dash_app.html', context={'app': app.get_app(app_name), 'app_name': app_name})
+
+
+
 
 
