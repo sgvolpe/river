@@ -389,7 +389,8 @@ def get_analys_df_app():
         return go.Figure(data=data, layout=layout)
 
 
-    def get_correlation_plots()
+    def get_correlation_plots():
+        pass
 
 
     @app.callback(outputs, inputs)
