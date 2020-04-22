@@ -1,6 +1,6 @@
 
 body {
-  background-color:#404040 ;/*#57817f ;*/
+  background-color:#e2e0e0;/*#57817f ;*/
   color: #57817f ;
   background-top: 10px;
   background-repeat: no-repeat;
@@ -8,6 +8,11 @@ body {
 
   font-family: 'Amiko', sans-serif;
 }
+
+.sgv-navbar{background-color: #404040;
+    margin-bottom: 25px;
+    border-bottom: white 5px solid
+    } /*;background-color:rgba(240, 248, 255, 0);*/
 
 
 #name{
@@ -25,6 +30,8 @@ body {
   font-family: 'Special Elite', cursive;
   //font-family: 'Frijole', cursive;
 }
+
+
 
 
 #name:hover{
@@ -104,9 +111,7 @@ sgv_h1 {
 
 }
 
-.navbar{
-    margin-bottom: 25px;background-color:rgba(240, 248, 255, 0);
-}
+
 
 
 /*.navbar-light .navbar-nav .nav-link{color:white}
@@ -120,6 +125,8 @@ sgv_h1 {
   background-color:white; text-align: center;/*font-size: 4.25rem;font-weight: 700; */
   width:90%;
   margin: auto;
+  box-shadow: 0 0 10px black;
+
 
 }
 

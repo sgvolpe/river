@@ -329,8 +329,7 @@ def get_analys_df_app():
     outputs = []
 
     div_charts = html.Div(className='row', id='charts_div', children=[
-            html.Div(id='table1', className='col'),
-            html.Div(id='outlayers_table', className='col')
+
     ])
 
     charts = ['chart1', 'chart2', 'correlation_chart']
@@ -341,57 +340,55 @@ def get_analys_df_app():
 
     outputs.append(Output('table1', 'children'))
     outputs.append(Output('outlayers_table', 'children'))
+    outputs.append(Output('full_Table', 'children'))
+
+    div_charts.children.append(html.Div(id='table1', className='col-6'))
+    div_charts.children.append(html.Div(id='outlayers_table', className='col-6'))
+    div_charts.children.append(html.Div(id='full_Table', className='col-6'))
 
     # Layout
     app.layout = html.Div([
-        html.Hr(),
-        html.Div(className='row', id='controls_div', children=[
+        #html.Div(children=dcc.Loading(type="circle", id='dynamic_controls', color='red', children=[
+            html.Hr(),
+            html.Div(className='row', id='controls_div', children=[
 
-            html.Div(className='col', children=[
-                html.H3('Metric'),
-                html.P(
-                    dcc.Dropdown(
-                        options=[{'label': col, 'value': col} for col in columns_numeric],
-                        value=columns_numeric[0],
-                        className='col-6',
-                        id='fixed-column'
+                html.Div(className='col', children=[
+                    html.H3('Metric'),
+                    html.P(
+                        dcc.Dropdown(
+                            options=[{'label': col, 'value': col} for col in columns_numeric],
+                            value=columns_numeric[0],
+                            className='col-6',
+                            id='fixed-column'
+                        )
+                        # , style={'display': 'none'}
                     )
-                    # , style={'display': 'none'}
-                )
+                ]),
+                html.Div(className='col', children=[
+                    html.H3('Variable'),
+                    html.P(
+                        dcc.Dropdown(
+                            options=[{'label': col, 'value': col} for col in columns_str],
+                            value=columns_str[0],
+                            className='col-6',
+                            id='column'
+                        )
+                        # , style={'display': 'none'}
+                    ),
+                ])
             ]),
-            html.Div(className='col', children=[
-                html.H3('Variable'),
-                html.P(
-                    dcc.Dropdown(
-                        options=[{'label': col, 'value': col} for col in columns_str],
-                        value=columns_str[0],
-                        className='col-6',
-                        id='column'
-                    )
-                    # , style={'display': 'none'}
-                ),
-            ])
-        ]),
-        div_charts,
-        html.Div(className='row', id='', children=[
-            html.Div(className="col-6", children=[
-                "Table",
-                dt.DataTable(
-                    id='table',
-                    columns=[{"name": i, "id": i} for i in df.columns],
-                    data=df.to_dict('records'),
-                ),
-            ]),
-        ]),
+            div_charts,
 
+        #                                  ])),
 
     ], className="principal")
+
 
 
     def get_chart1(column, fixed_column):
         names = df[fixed_column].unique()
         data = [
-            go.Violin(  # marker=dict(color=COLORS[provider], opacity=OPACITY),
+            go.Box(  # marker=dict(color=COLORS[provider], opacity=OPACITY),
                 name=name, x=df[df[fixed_column] == name][fixed_column],
                 y=df[df[fixed_column] == name][column]
             ) for name in names
@@ -475,11 +472,12 @@ def get_analys_df_app():
         try:
             generate_outlayers(fixed_column)
             chart1, chart2 = get_chart1(column=column, fixed_column=fixed_column), get_chart2(column=column, fixed_column=fixed_column)
-            table1 = generate_table_simple(df.describe())
+            table1 = generate_table_simple(df.describe().round(1))
             outlayers = generate_outlayers(fixed_column)
             outlayers_table = generate_table_simple(outlayers)
             correlation_chart = generate_correlation_chart(fixed_column)
-            return [chart1, chart2, correlation_chart, table1, outlayers_table]
+            full_Table = generate_table_simple(df)
+            return [chart1, chart2, correlation_chart, table1, outlayers_table,full_Table]
         except Exception as e: return [f'Error: {str(e)}' for i in outputs]
 
     if __name__ == '__main__':
