@@ -8,6 +8,11 @@ from django.shortcuts import render
 DEBUG = True
 
 def index(request):
+    apps = [
+            'analys_df_app',
+            'stock_app']
+    return render(request, 'basic_dash/index.html', context={'apps':apps})
+
     return HttpResponse('Basic Dash')
 
 def simple_example(request):
@@ -28,6 +33,7 @@ def analys_df_app(request):
 
 
 def render_app(request, app_name):
+    if DEBUG: print (app_name)
     return render(request, 'basic_dash/dash_app.html', context={'app': app.get_app(app_name), 'app_name': app_name})
 
 

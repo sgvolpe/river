@@ -1,6 +1,6 @@
 
 
-import datetime, json, requests
+import datetime, json, os, requests
 
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
@@ -8,7 +8,9 @@ import dash_html_components as html
 import dash_table as dt
 from django_plotly_dash import DjangoDash
 import plotly.graph_objs as go
+import plotly.express as px
 
+import dash_bootstrap_components as dbc
 import pandas as pd
 import pandas_datareader.data as web
 import plotly.graph_objs as go
@@ -34,7 +36,6 @@ def generate_table(df):
         page_size= 25,
     ),
 
-
 def generate_table_simple(dataframe, include_index=True, max_rows=100):
     return html.Table(
         children=
@@ -52,16 +53,37 @@ def generate_table_simple(dataframe, include_index=True, max_rows=100):
         className='table'
     )
 
+def generate_table2(dataframe, max_rows=350):
+    table_header = [ html.Thead(html.Tr( [html.Th(col) for col in dataframe.columns])) ] #[html.Th(dataframe.index.name, scope="col")] +
+    rows = [ html.Tr(children=[html.Td(dataframe.iloc[i][col]) for col in dataframe.columns]) for i
+             in range(min(len(dataframe), max_rows)) ] # html.Th(dataframe.index[i], scope="row")] +
+    table_body = [html.Tbody(rows)]
+
+    table = dbc.Table(table_header + table_body, bordered=True,
+    dark=True,
+    hover=True,
+    responsive=True,
+    striped=True,)
+    return table
+
 def get_simple_example():
-    app = DjangoDash('simple_example')   # replaces dash.Dash
+    app = DjangoDash('simple_example',add_bootstrap_links=True)   # replaces dash.Dash
     app.css.append_css({'external_url': 'https://codepen.io/amyoshino/pen/jzXypZ.css'})
     external_js = ["https://code.jquery.com/jquery-3.2.1.min.js", "https://codepen.io/bcd/pen/YaXojL.js"]
     for js in external_js:
         app.scripts.append_script({"external_url": js})
 
-    app.layout = html.Div(['algo',
+    app.layout = html.Div(
+        children=[
+            html.Div([
+                html.Div(['1123'], className="col"),
+                html.Div(['12312'], className="col"),
+                html.Div(['234234'], className="col"),
+            ], className="row")
 
-    ])
+        ],className="container"
+    )
+
 
     if __name__ == '__main__':
         app.run_server(debug=True)
@@ -94,7 +116,7 @@ def get_app2():
                         html.A(['Print PDF'],className="button no-print print",style={}),
                         html.H3('Choose Provider:'),
                     ],className='six columns'),
-                    html.Div([dcc.Graph(id='graph-1')], className= 'twelve columns', style={'height':'500px'}),
+                    html.Div([dcc.Graph(id='graph-1')], className= 'twelve columns', style={}),
 
 
                 ],className='row', style={'margin-top': '10'}),
@@ -279,11 +301,13 @@ def get_live_app():
 
 def get_app(app_name):
     return {
-        'analys_df_app':get_analys_df_app()
+        'analys_df_app':get_analys_df_app(),
+        'stock_app':get_stock_app(),
+        'simple_example':get_simple_example(),
     }[app_name]
 
 def get_analys_df_app():
-    app = DjangoDash('analys_df_app')
+    app = DjangoDash('analys_df_app', add_bootstrap_links=True)
     app.css.append_css({'external_url': 'https://codepen.io/amyoshino/pen/jzXypZ.css'})
     external_js = ["https://code.jquery.com/jquery-3.2.1.min.js", "https://codepen.io/bcd/pen/YaXojL.js"]
     for js in external_js: app.scripts.append_script({"external_url": js})
@@ -294,61 +318,72 @@ def get_analys_df_app():
     #COLORS = {'Alternate': '#E50000', 'Baseline': '#3399CC', 'Common': '#31B98E'}
 
     df = get_csv()
-    print (type(df.describe()))
 
-    columns = df.columns
+    columns_str = df.select_dtypes(include='object').columns
+    columns_numeric = df.select_dtypes(include=['float64', 'int']).columns
+
+    template = 'seaborn'
 
     inputs = [Input('fixed-column', 'value'),Input('column', 'value')]
-    outputs = [Output('chart1', 'figure'), Output('chart2', 'figure'), Output('table1', 'children'), ]
-    template = 'seaborn'
+    outputs = []
+
+    div_charts = html.Div(className='row', id='charts_div', children=[
+            html.Div(id='table1', className='col'),
+            html.Div(id='outlayers_table', className='col')
+    ])
+
+    charts = ['chart1', 'chart2', 'correlation_chart']
+    for chart_name in charts:
+        div_charts.children.append(html.Div([dcc.Graph(id=chart_name, style={}), ],
+                                            className="col-6", id=f'{chart_name}_div'),)
+        outputs.append(Output(chart_name, 'figure'))
+
+    outputs.append(Output('table1', 'children'))
+    outputs.append(Output('outlayers_table', 'children'))
 
     app.layout = html.Div([
         html.Hr(),
-        html.Div([
-            html.Div([
-                    html.H4('Controls'),
-                        html.P(
+        html.Div(className='row', id='controls_div', children=[
 
-                            dcc.Dropdown(
-                                options=[{'label': col, 'value': col} for col in columns],
-                                value='',
-                                className='col-6',
-                                id='fixed-column'
-                            )
-                            # , style={'display': 'none'}
-                        ),
-                        ],className='col'),
-            html.Div([
-                      html.H4('Controls'),
-                      html.P(
-                          dcc.Dropdown(
-                              options=[{'label': col, 'value': col} for col in columns],
-                              value='',
-                              className='col-6',
-                              id='column'
-                          )
-                          # , style={'display': 'none'}
-                      ),
-                  ]),
-        ], className="row"),
-        html.Div([
-            html.H3('Charts'),
-            html.Div(["Chart1", dcc.Graph(id='chart1', style={'width': 1200}),], className="col", id='chart1_div'),
-            html.Div(["Chart2", dcc.Graph(id='chart2', style={'width': 1200}),], className="col", id='chart2_div'),
-            html.Div(id='table1', className='col-4 table-responsive', style={"margin-top": "1rem", "box-shadow": "2px 2px 2px lightgrey"}
-                     )
+            html.Div(className='col', children=[
+                html.H3('Metric'),
+                html.P(
+                    dcc.Dropdown(
+                        options=[{'label': col, 'value': col} for col in columns_numeric],
+                        value=columns_numeric[0],
+                        className='col-6',
+                        id='fixed-column'
+                    )
+                    # , style={'display': 'none'}
+                )
+            ]),
+            html.Div(className='col', children=[
+                html.H3('Variable'),
+                html.P(
+                    dcc.Dropdown(
+                        options=[{'label': col, 'value': col} for col in columns_str],
+                        value=columns_str[0],
+                        className='col-6',
+                        id='column'
+                    )
+                    # , style={'display': 'none'}
+                ),
+            ])
+        ]),
+        div_charts,
+        html.Div(className='row', id='', children=[
+            html.Div(className="col-6", children=[
+                "Table",
+                dt.DataTable(
+                    id='table',
+                    columns=[{"name": i, "id": i} for i in df.columns],
+                    data=df.to_dict('records'),
+                ),
+            ]),
+        ]),
 
-        ], className="row", id='charts_div'),
-        html.Div([
-            html.H3('Itinerary Table'),
-            dt.DataTable(
-                id='table',
-                columns=[{"name": i, "id": i} for i in df.columns],
-                data=df.to_dict('records'),
-            ),
-        ], className="row"),
 
-    ], className="row")
+    ], className="container")
 
 
     def get_chart1(column, fixed_column):
@@ -388,19 +423,67 @@ def get_analys_df_app():
         }
         return go.Figure(data=data, layout=layout)
 
+    def generate_correlation_chart(fixed_column):
 
-    def get_correlation_plots():
-        pass
+        index_vals = df[fixed_column].astype('category').cat.codes
+
+        fig = go.Figure(data=go.Splom(
+            dimensions=[dict(label=c, values=df[c]) for c in columns_numeric],
+
+            text=df[fixed_column],
+            marker=dict(color=index_vals,
+                        showscale=False,  # colors encode categorical variables
+                        line_color='white', line_width=0.5)
+        ))
+
+        fig.update_layout(
+            title='Iris Data set',
+            width=600,
+            height=600,
+        )
+
+        return fig
+
+    def generate_outlayers(fixed_column):
+        #def get_outlayers(self, param='Total Unsuccessful', date=None, dataframe=None):
+
+        D = []
+        for category in df[fixed_column].unique():
+            specific_df = df[df[fixed_column] == category]
+            for feature in columns_numeric:
+                specific_df['measuring'] = specific_df[feature]
+
+                qv1 = specific_df[feature].quantile(0.25)
+                qv3 = specific_df[feature].quantile(0.75)
+                qv_limit = 1.5 * (qv3 - qv1)
+                un_outliers_mask = (specific_df[feature] > qv3 + qv_limit) | (specific_df[feature] < qv1 - qv_limit)
+                un_outliers_data = specific_df[feature][un_outliers_mask]
+                un_outliers_name = specific_df[un_outliers_mask]
+
+                if un_outliers_data.shape[0] >0 :
+                    for i in [{'feature': feature, 'category': category, 'value': val} for val in un_outliers_data]:
+                        D.append(i)
+
+        return pd.DataFrame(D)
+
 
 
     @app.callback(outputs, inputs)
     def update_charts(column, fixed_column):
-        chart1, chart2 = get_chart1(column=column, fixed_column=fixed_column), get_chart2(column=column, fixed_column=fixed_column)
-        table1 = generate_table_simple(df.describe())
-        return [chart1, chart2, table1]
+        try:
+            generate_outlayers(fixed_column)
+            chart1, chart2 = get_chart1(column=column, fixed_column=fixed_column), get_chart2(column=column, fixed_column=fixed_column)
+            table1 = generate_table_simple(df.describe())
+            outlayers = generate_outlayers(fixed_column)
+            outlayers_table = generate_table_simple(outlayers)
+            correlation_chart = generate_correlation_chart(fixed_column)
+            return [chart1, chart2, correlation_chart, table1, outlayers_table]
+        except Exception as e: return [f'Error: {str(e)}' for i in outputs]
 
     if __name__ == '__main__':
-        app.run_server(debug=True)
+        try:
+            app.run_server(debug=True)
+        except: return 'Error'
 
     return app
 
