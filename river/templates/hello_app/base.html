@@ -3,6 +3,8 @@
 {% load bootstrap4 %}
 <html lang="en" dir="ltr">
   <head>
+      {% load plotly_dash %}
+      {% plotly_header %}
     <meta charset="utf-8">
     {% block title %}<title>River</title>{% endblock %}
 
@@ -28,7 +30,7 @@
      <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.0/color-thief.umd.js"></script>
      <!-- Custom CSS -->
      <link rel="stylesheet" type="text/css" href="{% static 'css/mystyle.css' %}">
-     <link rel="stylesheet" type="text/css" href="{% static 'css/external.css' %}">
+
 
       <!-- Custom js -->
       <script src="{% static 'js/generic.js' %}"></script>
@@ -37,14 +39,13 @@
 
 
   </head>
-  <body style="background={% static 'images/background.jpg' %}">
-    <nav id='' class="navbar navbar-expand-lg navbar-light bg-light">
+  <body >
+    <nav class="navbar navbar-expand-lg sgv-navbar" >
          <div class="col-sm-6">
            <a href="{% url 'index'%}">
                <img src="{% static 'images/river_ico.jpg' %}"  height="42" width="42" alt="oops.."/>
            </a>
          </div>
-
          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
            <span class="navbar-toggler-icon"></span>
          </button>
@@ -59,27 +60,9 @@
               {% endif %}
 
              <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Admin</a></li>
-             <li class="nav-item"></li>
-             <li class="nav-item dropdown">
-               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                 Dash
-               </a>
-               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                 <a class="nav-link" href="{% url 'basic_dash:index' %}">app2</a>
-                 <div class="dropdown-divider"></div>
-                 <a class="dropdown-item" href="#">Something else here</a>
-               </div>
-             </li>
-             <li class="nav-item dropdown">
-               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                 Dashboards
-               </a>
-               <div class="dropdown-menu" aria-labelledby="navbarDropdown2">
-                 <a class="nav-link" href="">Benchmarks</a>
+             <li class="nav-item"><a class="nav-link" href="{% url 'basic_dash:index' %}">app2</a></li>
 
 
-               </div>
-             </li>
 
 
            </ul>
@@ -89,11 +72,8 @@
            </form-->
          </div>
        </nav>
-
-    <div class="">
-        {% block content %}
-        {% endblock %}
-    </div>
+    {% block content %}
+    {% endblock %}
     <footer class="footer">
       <div class="container">
         <span class="text-muted"> - by:SGV - </span><br>
@@ -103,5 +83,6 @@
       </div>
     </footer>
   </body>
+    {% plotly_footer %}
 </html>
 

@@ -1,10 +1,11 @@
 
 body {
-  color:#12525db3 ;
+  background-color:#404040 ;/*#57817f ;*/
+  color: #57817f ;
   background-top: 10px;
   background-repeat: no-repeat;
   background-position: center;
-  background-color: rgba(255, 255, 255, 0.15);
+
   font-family: 'Amiko', sans-serif;
 }
 
@@ -56,6 +57,7 @@ body {
   overflow-x: hidden;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
+  background-color: rgba(255, 255, 255, 0.15);
 
 }
 
@@ -91,7 +93,7 @@ sgv_h1 {
 }
 
 .footer {
-   background-color: rgba(255, 255, 255, 0.15);
+   background-color: rgba(240, 248, 255, 0);
    position: fixed;
    left: 0;
    bottom: 0;
@@ -102,22 +104,27 @@ sgv_h1 {
 
 }
 
+.navbar{
+    margin-bottom: 25px;background-color:rgba(240, 248, 255, 0);
+}
 
 
-
-//.navbar-light .navbar-nav .nav-link{color:white}
-//.navbar-light .navbar-nav .nav-link.dropdown-toggle{color:white}
-//.navbar-light .navbar-nav .nav-link{color:white}
-//.nav-item active{ color:white}
-//.nav-link{color:white}
-
+/*.navbar-light .navbar-nav .nav-link{color:white}
+.navbar-light .navbar-nav .nav-link.dropdown-toggle{color:white}
+.navbar-light .navbar-nav .nav-link{color:white}
+.nav-item active{ color:white}
+*/
+.nav-link{color:white}
 
 .principal{
-  color:white; font-size: 4.25rem;font-weight: 700; text-align: center;
+  background-color:white; text-align: center;/*font-size: 4.25rem;font-weight: 700; */
+  width:90%;
+  margin: auto;
+
 }
 
 .parallax {
-    background-image: url("https://picsum.photos/id/42/3456/2304");
+    /*background-image: url("https://picsum.photos/id/42/3456/2304");*/
     height: 250px;
     /* Create the parallax scrolling effect */
     background-attachment: fixed;

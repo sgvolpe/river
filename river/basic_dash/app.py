@@ -212,7 +212,7 @@ def get_stock_app():
          State('my_date_picker', 'end_date')])
     def update_graph(n_clicks, stock_ticker, start_date, end_date):
         start = datetime.datetime.strptime(start_date[:10], '%Y-%m-%d')
-        print (start)
+
         end = datetime.datetime.strptime(end_date[:10], '%Y-%m-%d')
         # since stock_ticker is now a list of symbols, create a list of traces
         traces = []
@@ -306,6 +306,7 @@ def get_app(app_name):
         'simple_example':get_simple_example(),
     }[app_name]
 
+
 def get_analys_df_app():
     app = DjangoDash('analys_df_app', add_bootstrap_links=True)
     app.css.append_css({'external_url': 'https://codepen.io/amyoshino/pen/jzXypZ.css'})
@@ -341,6 +342,7 @@ def get_analys_df_app():
     outputs.append(Output('table1', 'children'))
     outputs.append(Output('outlayers_table', 'children'))
 
+    # Layout
     app.layout = html.Div([
         html.Hr(),
         html.Div(className='row', id='controls_div', children=[
@@ -383,7 +385,7 @@ def get_analys_df_app():
         ]),
 
 
-    ], className="container")
+    ], className="principal")
 
 
     def get_chart1(column, fixed_column):
@@ -483,7 +485,8 @@ def get_analys_df_app():
     if __name__ == '__main__':
         try:
             app.run_server(debug=True)
-        except: return 'Error'
+        except Exception as e: return f'Error: {str(e)}'
+    print('APP LOADED')
 
     return app
 

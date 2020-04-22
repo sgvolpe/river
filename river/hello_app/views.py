@@ -18,6 +18,10 @@ def index(request):
     return render(request, 'hello_app/index.html', context={})
     #return HttpResponse('Hello!')
 
+def new_index(request):
+    return render(request, 'hello_app/new_index.html', context={})
+
+
 def bye(request):
     return render(request, 'hello_app/bye.html', context={})
 

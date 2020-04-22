@@ -5,13 +5,14 @@
 {% load plotly_dash %}
 
 {% block content %}
- <div class="">
+     <div style="margin: auto; width:90%;">
 
-        {%if app %}
-             {%plotly_app_bootstrap  name=app_name %}
-        {%else %}
-          <p>We couldn't load the View. Please check.</p>
-        {% endif %}
+            {%if app %}
+                 {%plotly_direct  name=app_name %}
+            {%else %}
+              <p>We couldn't load the View. Please check.</p>
+            {% endif %}
 
-</div>
+
+    </div>
 {% endblock %}
