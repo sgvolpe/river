@@ -7,14 +7,16 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_table as dt
 from django_plotly_dash import DjangoDash
-import plotly.graph_objs as go
+
 import plotly.express as px
 
 import dash_bootstrap_components as dbc
+import numpy as np
 import pandas as pd
 import pandas_datareader.data as web
 import plotly.graph_objs as go
 import plotly.io as pio
+import seaborn as sns
 
 def generate_table(df):
     return dt.DataTable(
@@ -54,6 +56,7 @@ def generate_table_simple(dataframe, include_index=True, max_rows=100):
     )
 
 def generate_table2(dataframe, max_rows=350):
+    print ('Generating table2')
     table_header = [ html.Thead(html.Tr( [html.Th(col) for col in dataframe.columns])) ] #[html.Th(dataframe.index.name, scope="col")] +
     rows = [ html.Tr(children=[html.Td(dataframe.iloc[i][col]) for col in dataframe.columns]) for i
              in range(min(len(dataframe), max_rows)) ] # html.Th(dataframe.index[i], scope="row")] +
@@ -301,11 +304,11 @@ def get_live_app():
 
 def get_app(app_name):
     return {
-        'analys_df_app':get_analys_df_app(),
-        'stock_app':get_stock_app(),
-        'simple_example':get_simple_example(),
+        'analys_df_app': get_analys_df_app(),
+        'stock_app': get_stock_app(),
+        'simple_example': get_simple_example(),
+        'linear_regression': get_linear_regression(),
     }[app_name]
-
 
 def get_analys_df_app():
     app = DjangoDash('analys_df_app', add_bootstrap_links=True)
@@ -489,8 +492,156 @@ def get_analys_df_app():
     return app
 
 
+def get_linear_regression():
+    app = DjangoDash('linear_regression', add_bootstrap_links=True)
+    app.css.append_css({'external_url': 'https://codepen.io/amyoshino/pen/jzXypZ.css'})
+    external_js = ["https://code.jquery.com/jquery-3.2.1.min.js", "https://codepen.io/bcd/pen/YaXojL.js"]
+    for js in external_js: app.scripts.append_script({"external_url": js})
+
+    df_path = os.path.join('static/dfs/USA_Housing.csv')
+    USAhousing = pd.read_csv(df_path)
+
+    features = ['Avg. Area Income', 'Avg. Area House Age', 'Avg. Area Number of Rooms',
+               'Avg. Area Number of Bedrooms', 'Area Population']
+    variable = ['Price']
+
+    columns_str = USAhousing.select_dtypes(include='object').columns
+    columns_numeric = USAhousing.select_dtypes(include=['float64', 'int']).columns
 
 
+
+    div_charts = html.Div(className='row', id='charts_div', children=[])
+    div_tables = html.Div(className='row', id='tables_div', children=[])
+
+    charts = {'my_graph': {'className': 'col-6', 'style': {}},
+              'correlation_graph': {'className': 'col-12', 'style': {}},
+              }
+    outputs = []
+    for chart_name, settings in charts.items():
+        div_charts.children.append(html.Div([dcc.Graph(id=chart_name, style=settings['style']), ], className=settings['className'], id=f'{chart_name}_div'), )
+        outputs.append(Output(chart_name, 'figure'))
+
+    tables = ['table1']
+    for table_name in tables:
+        div_tables.children.append(html.Div(id=f'{table_name}', className='col-6'))
+        outputs.append(Output(table_name, 'children'))
+
+    app.layout = html.Div([
+        # html.Div(children=dcc.Loading(type="circle", id='dynamic_controls', color='red', children=[
+        html.Hr(),
+        html.Div(className='row', id='controls_div', children=[
+            html.H1('Linear Regression Model'),
+
+            html.Div(className='col', children=[
+                html.H3('Metric'),
+                html.P(
+                    dcc.Dropdown(
+                        options=[{'label': col, 'value': col} for col in columns_numeric],
+                        value=columns_numeric[0],
+                        className='col-6',
+                        id='fixed-column'
+                    )
+                    # , style={'display': 'none'}
+                )
+            ]),
+            html.Div(className='col', children=[
+                html.H3('Variable'),
+                html.P(
+                    dcc.Dropdown(
+                        options=[{'label': col, 'value': col} for col in columns_str],
+                        value=columns_str[0],
+                        className='col-6',
+                        id='column'
+                    )
+                    # , style={'display': 'none'}
+                ),
+                html.Button(
+                    id='submit-button',
+                    n_clicks=0,
+                    children='Submit',
+                    style={'fontSize': 24, 'marginLeft': '30px'}
+                ),
+            ])
+        ]),
+        div_charts,
+        div_tables,
+
+        #                                  ])),
+
+    ], className="principal")
+
+
+
+    inputs = [Input('submit-button', 'n_clicks'), ]
+
+
+    @app.callback(outputs, inputs)
+    def update_outputs(n_clicks):
+        print('Generating Output')
+
+        return get_charts()
+
+    def generate_correlation_chart(df):
+        #index_vals = df[fixed_column].astype('category').cat.codes
+
+        fig = go.Figure(data=go.Splom(
+            dimensions=[dict(label=c, values=df[c]) for c in columns_numeric],
+
+         #   text=df[fixed_column],
+            marker=dict(#color=index_vals,
+                        #showscale=False,  # colors encode categorical variables
+                        line_color='white', line_width=0.5)
+        ))
+
+        fig.update_layout(
+            title='Iris Data set',
+            width=600,
+            height=600,
+        )
+
+        return fig
+
+    def get_charts():
+        print ('getting')
+        from sklearn.model_selection import train_test_split
+        from sklearn.linear_model import LinearRegression
+        from sklearn import metrics
+
+        X = USAhousing[['Avg. Area Income', 'Avg. Area House Age', 'Avg. Area Number of Rooms',
+                        'Avg. Area Number of Bedrooms', 'Area Population']]
+        y = USAhousing['Price']
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4, random_state=101)
+
+        lm = LinearRegression()
+        lm.fit(X_train, y_train)
+        coeff_df = pd.DataFrame(lm.coef_, X.columns, columns=['Coefficient'])
+        predictions = lm.predict(X_test)
+
+        #sns.distplot((y_test-predictions),bins=50);
+
+        print('MAE:', metrics.mean_absolute_error(y_test, predictions))
+        print('MSE:', metrics.mean_squared_error(y_test, predictions))
+        print('RMSE:', np.sqrt(metrics.mean_squared_error(y_test, predictions)))
+
+        fig = go.Figure(
+            data=[go.Scatter(
+                x=y_test,
+                y=predictions,
+                mode='markers',#'lines+markers'
+            )])
+        return [fig, generate_correlation_chart(USAhousing), generate_table_simple(coeff_df)]
+
+    if __name__ == '__main__':
+        try:
+            print ('loading')
+
+            app.run_server(debug=True)
+        except Exception as e:
+            print ('error')
+            return f'Error: {str(e)}'
+    print('APP LOADED')
+
+    return app
 
 
 def read_flight_radar(path='static/dfs/flight_radar24_example.csv'):
