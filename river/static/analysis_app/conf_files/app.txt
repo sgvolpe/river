@@ -1,0 +1,1 @@
+{"charts":["chart1", "chart2", "correlation_chart", "get_null_map"],"tables":["table1", "outlayers_table", "full_Table"],"style":{"colors": {"Alternate": "#E50000", "Baseline": "#3399CC", "Common": "#31B98E"},"opacity": 0.9, "template": "seaborn", "chart_font":{"family":"inherit", "size":15}}}
