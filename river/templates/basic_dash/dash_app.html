@@ -1,18 +1,15 @@
 
-{% extends 'hello_app/base.html' %}
+{% extends 'base.html' %}
 {% load bootstrap4 %}
 {% load static %}
 {% load plotly_dash %}
 
 {% block content %}
      <div style="margin: auto; width:90%;">
-
             {%if app %}
-                 {%plotly_direct  name=app_name %}
+                 {% plotly_direct  name=app_name %}
             {%else %}
               <p>We couldn't load the View. Please check.</p>
             {% endif %}
-
-
     </div>
 {% endblock %}

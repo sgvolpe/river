@@ -16,12 +16,19 @@ Including another URLconf
 from django.conf.urls import include
 from django.contrib import admin
 from django.urls import path, re_path
-from hello_app import views
+from . import views
+#from hello_app import views
+
+app_name = 'river'
 
 urlpatterns = [
-    re_path('^$', views.index, name='index'),
+    path('', views.index, name='index'),
+    path('admin/', admin.site.urls),
     path('hello_app/', include('hello_app.urls')),
     path('basic_dash/', include('basic_dash.urls')),
-    path('admin/', admin.site.urls),
+    path('dashboard/', include('dashboard.urls')),
     path('django_plotly_dash/', include('django_plotly_dash.urls'),name='the_django_plotly_dash'),
+
 ]
+
+

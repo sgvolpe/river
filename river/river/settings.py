@@ -41,9 +41,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bootstrap4',
+    'river',
+    'dashboard',
     'hello_app',
     'basic_dash',
     'dash',
+
     'django_plotly_dash.apps.DjangoPlotlyDashConfig',
 
 

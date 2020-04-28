@@ -11,12 +11,9 @@ from django.urls import reverse # from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 
 
-
-
-
 def index(request):
-    return render(request, 'hello_app/index.html', context={})
-    #return HttpResponse('Hello!')
+    return render(request, 'hello_app/--index.html', context={})
+    return HttpResponse('Hello!')
 
 def new_index(request):
     return render(request, 'hello_app/new_index.html', context={})

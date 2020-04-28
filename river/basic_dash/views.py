@@ -8,10 +8,11 @@ from django.shortcuts import render
 DEBUG = True
 
 def index(request):
+    #return HttpResponse ('TEST')
     apps = [
             'analys_df_app',
             'stock_app']
-    return render(request, 'basic_dash/index.html', context={'apps':apps})
+    return render(request, 'basic_dash/--index.html', context={'apps':apps})
 
     return HttpResponse('Basic Dash')
 

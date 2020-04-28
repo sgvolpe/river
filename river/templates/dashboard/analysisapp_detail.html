@@ -1,0 +1,23 @@
+
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load static %}
+{% load plotly_dash %}
+
+{% block title %}
+    <title>{{analysisapp.title}}</title>
+
+{% endblock %}
+{% block content %}
+    <div style="margin: auto; width:90%;">
+        {%if app %}
+             {% plotly_direct  name=app_name %}
+        {%else %}
+            <p>We couldn't load the View. Please check.</p>
+            <p>{{now}}</p>
+        {% endif %}
+    </div>
+
+
+<hr>
+{% endblock %}

@@ -3,7 +3,7 @@ from . import views
 from django.conf.urls import url, include
 
 urlpatterns = [
-    re_path('^$', views.index, name='index'),
+    path('index', views.index, name='index'),
     #re_path('^simple_example', views.simple_example, name='simple_example'),
     #re_path('^app2', views.app2, name='app2'),
     #re_path('^stock_app', views.stock_app, name='stock_app'),
