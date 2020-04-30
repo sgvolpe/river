@@ -1,0 +1,31 @@
+<OTA_AirLowFareSearchRQ xmlns="http://www.opentravel.org/OTA/2003/05" Version="3.3.0">
+  <POS>
+    <Source PseudoCityCode="FF9A">
+      <RequestorID Type="0.AAA.X" ID="REQ.ID">
+        <CompanyName Code="TN"/>
+      </RequestorID>
+    </Source>
+  </POS>
+  <OriginDestinationInformation RPH="1">
+    <DepartureDateTime>2018-11-05T11:00:00</DepartureDateTime>
+    <OriginLocation LocationCode="LON"/>
+    <DestinationLocation LocationCode="BKK"/>
+  </OriginDestinationInformation>
+  <OriginDestinationInformation RPH="2">
+    <DepartureDateTime>2018-11-12T11:00:00</DepartureDateTime>
+    <OriginLocation LocationCode="BKK"/>
+    <DestinationLocation LocationCode="LON"/>
+  </OriginDestinationInformation>
+
+  <TravelerInfoSummary>
+    <AirTravelerAvail>
+      <PassengerTypeQuantity Code="ADT" Quantity="1"/>
+    </AirTravelerAvail>
+  </TravelerInfoSummary>
+  <TPA_Extensions>
+    <IntelliSellTransaction>
+      <RequestType Name="50ITINS"/>
+      <CompressResponse Value="true"/>
+    </IntelliSellTransaction>
+  </TPA_Extensions>
+</OTA_AirLowFareSearchRQ>

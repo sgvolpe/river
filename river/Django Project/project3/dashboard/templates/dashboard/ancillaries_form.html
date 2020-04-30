@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}<title>Ancillaries by GDS</title>{% endblock %}
+{% block content %}
+
+{% spaceless %}
+
+<form class="form-horizontal" action="ancillaries_calculate" method="post" target="put-some-data" enctype="multipart/form-data">
+  {% csrf_token %}
+   <div class="form-group">
+     <h2>GDS Ancillaries Comparison </h2>
+   </div>
+  <div class="form-group">
+    <div class="radio">
+      <label><input type="radio" name="optradio" checked value="_carriers">Carriers</label>
+    </div>
+    <div class="radio">
+      <label><input type="radio" name="optradio" value="_bookings">Bookings</label>
+    </div>
+    <div class="radio">
+      <label><input type="radio" name="optradio" value="_booking_complementary">Bookings Complementary</label>
+    </div>
+    <div class="radio">
+      <label><input type="radio" name="optradio" value="_carrier_complementary">Carriers Complementary</label>
+    </div>
+    <div class="radio">
+      <label><input type="radio" name="optradio" value="test">test</label>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="checkbox-inline"><input type="checkbox" value="Seats" name="anc">Seats</label>
+    <label class="checkbox-inline"><input type="checkbox" value="Baggage" name="anc">Baggage</label>
+    <label class="checkbox-inline"><input type="checkbox" value="Lounge" name="anc">Lounge</label>
+    <label class="checkbox-inline"><input type="checkbox" value="Meals" name="anc">Meals</label>
+    <label class="checkbox-inline"><input type="checkbox" value="Pets" name="anc">Pets</label>
+    <label class="checkbox-inline"><input type="checkbox" value="Medical" name="anc">Medical</label>
+  </div>
+  <div class="form-group">
+    <label class="control-label col-sm-2" for="file">Bookings File:</label>
+    <div class="col-sm-10">
+      <input type="file" class="form-control-file" id="file" name="file">
+    </div>
+  </div>
+
+
+
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <button id="update-charts" type="submit" class="btn btn-default">Submit</button>
+    </div>
+  </div>
+</form>
+
+<div class="col-sm-12">
+<iframe class="form-group" id="put-some-data" name="put-some-data" style="height:600px;width:800px" ></iframe >
+</div>
+<script>
+
+
+
+</script>
+
+{% load staticfiles %}
+{% block custom_styles %}
+    <script src="{% static "dashboard/amcharts/amcharts.js" %}"></script>
+    <script src="{% static "dashboard/amcharts/serial.js" %}"></script>
+    <script src="{% static "dashboard/amcharts/pie.js" %}"></script>
+    <script src="{% static "dashboard/amcharts/themes/light.js" %}"></script>
+    <script src="{% static "dashboard/amcharts/plugins/export/export.js" %}"></script>
+    <link rel="stylesheet" href="http://www.amcharts.com/lib/3/plugins/export/export.css"/>
+{% endblock %}
+
+
+
+{% endspaceless %}
+{% endblock %}

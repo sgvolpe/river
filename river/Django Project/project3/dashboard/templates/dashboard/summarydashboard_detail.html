@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+{% load static %}
+{% load staticfiles %}
+{% load plotly_dash %}
+
+
+<link rel="stylesheet" href="{% static 'css/master.css' %}">
+{% block content %}
+  <div class="container">
+    <div class="col-xs-12">
+      <h2>Shopping Analysis - {{summarydashboard.title}}</h2>
+      <div class="col-xs-8">
+        <h4>{{summarydashboard.description}}</h4>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      {% for ind_dash in summarydashboard.individual_dashboards.all %}
+
+        <a class="nav-link" href="{% url 'dashboard:individual_view' pk=ind_dash.pk %}">{{ind_dash.id}}</a>
+      {% endfor %}
+    </div>
+
+    <h4>../{{summarydashboard.csv_file.url}}</h4>
+    <h6><a href="../../../{{summarydashboard.csv_file.url}}" download>Download File</a></h6>
+  </div>
+
+
+  {%if app %}
+  <div class="cl">
+    {% plotly_app name="summary_app" ratio=1   %}
+  </div>
+
+  {%else %}
+    <p>We couldn't load the Dashboard. Please check.</p>
+  {% endif %}
+{% endblock %}

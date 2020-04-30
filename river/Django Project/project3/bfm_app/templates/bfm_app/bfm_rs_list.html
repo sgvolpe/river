@@ -1,0 +1,24 @@
+
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+{% block content %}
+
+  <div class="container">
+    <h1>BFM List</h1>
+    <div class="col-md-8">
+      <a href="{% url 'bfm_app:new' %}">Create New</a>
+    <div/>
+
+    <div class="col-md-8">
+    	<ul>
+        {% for bfm_rs in bfm_rs_list %}
+        <li class="group li-with-bullet">
+					<a href="{% url 'bfm_app:view' pk=bfm_rs.pk %}">{{bfm_rs.id}} - {{bfm_rs.description}}</a>
+				</li>        
+    	{% endfor %}
+      </ul>
+    </div>
+  </div>
+
+{% endblock %}

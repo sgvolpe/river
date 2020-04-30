@@ -1,0 +1,17 @@
+
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+
+
+{% block content %}
+
+<div class="container">
+  <h1>App Directory</h1>
+
+
+    <a href="{% url 'web_apps:generate_dates_form' %}">Generate Dates</a>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,594 @@
+
+from __future__ import unicode_literals
+from django.shortcuts import render
+
+from . import models
+
+# Create your views here.
+from django.http import HttpResponse
+import os, re
+from datetime import datetime
+from collections import OrderedDict
+
+
+import numpy as np
+import pandas as pd
+import seaborn as sns
+from sklearn import preprocessing
+import matplotlib.pyplot as plt
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
+
+from braces.views import SelectRelatedMixin
+
+from django.shortcuts import render
+from django.http.response import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views import generic
+from django.views.generic import (TemplateView, ListView)
+
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
+from django_plotly_dash import DjangoDash
+import plotly.graph_objs as go
+import base64
+import datetime
+import io
+
+import dash
+from dash.dependencies import Input, Output, State
+import dash_core_components as dcc
+import dash_html_components as html
+import dash_table_experiments as dt
+
+import pandas as pd
+import dash
+from dash.dependencies import Input, Output, State
+import dash_core_components as dcc
+import dash_html_components as html
+import dash_table_experiments as dt
+import json
+import pandas as pd
+import numpy as np
+import plotly
+
+from . models import Dashboard, StatelessApp
+
+from plotly.graph_objs import *
+
+
+def generate_table(dataframe, max_rows=10):
+    return html.Table(
+        # Header
+        [html.Tr([html.Th(col) for col in dataframe.columns])] +
+
+        # Body
+        [html.Tr([
+            html.Td(dataframe.iloc[i][col]) for col in dataframe.columns
+        ]) for i in range(min(len(dataframe), max_rows))]
+    )
+
+def getapp(file_path=r''):
+    'https://codepen.io/chriddyp/pen/bWLwgP.css'
+    app = DjangoDash('dash2')
+    df = pd.read_csv(file_path)
+    app.css.append_css({'external_url': 'https://codepen.io/amyoshino/pen/jzXypZ.css'})
+
+    ond = df['market'][0]
+    date = df['search_date'][0]
+    ap_los = df['ap_los'][0]
+    provider_count = dict((df['provider'].value_counts()))
+    external_js = ["https://code.jquery.com/jquery-3.2.1.min.js","https://codepen.io/bcd/pen/YaXojL.js"]
+
+    for js in external_js:
+        app.scripts.append_script({"external_url": js})
+
+    app.layout = html.Div(
+        html.Div([
+            html.Div([
+                html.Div(children=[
+                    html.H1(children=ond),
+                    html.H3(children=date),
+                    html.H4(children=str(provider_count)),
+                    html.H5(children=str(ap_los)),
+                    #generate_table(df['is_duplicate'].value_counts())
+
+
+                ],className='row'),
+                html.Div([
+                    html.Div([
+                        html.A(['Print PDF'],className="button no-print print",style={}),
+                        html.H3('Choose Provider:'),
+                        html.Div([
+                        dcc.Checklist(id = 'Provider', values=['sabre', 'competitor','overlap'], labelStyle={'display': 'inline-block'},
+                            options=[{'label': 'Sabre', 'value': 'sabre'},{'label': 'Competitor', 'value': 'competitor'},{'label': 'Overlap', 'value': 'overlap'}]
+                        )],className='row'),
+                    ],className='six columns'),
+                    html.Div([dcc.Graph(id='time_vs_fare-graph')], className= 'twelve columns', style={'height':'500px'}),
+                    html.Div([dcc.Graph(id='overlap-graph')], className= 'twelve columns'),
+                    html.Div([dcc.Graph(id='fare-graph')], className= 'twelve columns'),
+
+                ],className='row', style={'margin-top': '10'}),
+
+            ], className="row"),
+
+            html.Div(
+                [
+                html.Div([dcc.Graph(figure=go.Figure(),id='overlap_pie-graph')], className= 'six columns'),
+                html.Div([dcc.Graph(id='violin-graph')], className= 'six columns'),
+            ], className="ten columns"),
+
+            html.Div([
+                html.Div([
+                        html.H3('Itinerary Table'),
+                        dt.DataTable( rows=df.to_dict('records'), row_selectable=True, filterable=True, sortable=True, selected_row_indices=[],
+                        id='datatable-gapminder')
+                    ], className="twelve columns"),
+            ], style={'width':'100%','font-size':'0.8em'})
+
+        ], className='ten columns offset-by-one')
+    )
+
+    @app.callback(
+        dash.dependencies.Output('violin-graph', 'figure'),
+        [dash.dependencies.Input('Provider', 'values'),Input('datatable-gapminder', 'rows'), Input('datatable-gapminder', 'selected_row_indices')])
+    def update_image_src2(selector,rows, selected_row_indices):
+        fig = plotly.tools.make_subplots( rows=1, cols=1, subplot_titles=('Fare Distribution by Provider',  ))
+
+        if len(selected_row_indices) != 0: rows = [rows[x] for x in selected_row_indices]
+        df = pd.DataFrame(rows)
+        df = df[ df['provider'].isin( selector ) ]
+
+        providers = pd.unique(df['provider'])
+        for provider in providers:
+            fig.append_trace({
+                "x": df['provider'][df['provider'] == provider],
+                'y': df['fare'][df['provider'] == provider],
+                "name": provider,
+                'type': 'violin',
+                "box": {"visible": True},
+                "meanline": {"visible": True},
+                #'color': {'competitor':'blue','sabre':'red'}[provider],
+            }, 1, 1)
+        return fig
+
+
+    @app.callback(
+        dash.dependencies.Output('fare-graph', 'figure'),[dash.dependencies.Input('Provider', 'values'),Input('datatable-gapminder', 'rows'), Input('datatable-gapminder', 'selected_row_indices')])
+    def update_image_src(selector,rows, selected_row_indices):
+
+        if len(selected_row_indices) != 0: rows = [rows[x] for x in selected_row_indices]
+        df = pd.DataFrame(rows)
+        fig = plotly.tools.make_subplots( rows=1, cols=1, subplot_titles=('Fare Comparison',  ), shared_xaxes=False,shared_yaxes=False)
+
+        sdf = [float(x) for x in list(df[df['provider']=='sabre']['fare'])]
+        cdf = [float(x) for x in  list(df[df['provider']=='competitor']['fare']) ]
+
+        fig.append_trace({
+            'y': sdf,
+            'x': [i for i in range(len(sdf))],
+            'type':'scatter','name':'Sabre',
+            'marker': {'color':'red'}
+
+        } ,1, 1)
+        fig.append_trace({
+            'y': cdf,
+            'x': [i for i in range(len(cdf))],
+            'type':'scatter','name':'Competitor',
+            'marker': {'color':'blue'}
+
+        } ,1, 1)
+        fig.append_trace({
+            'y': [s - c for s, c in zip(sdf,cdf)],
+            'x': [i for i in range(min (len(cdf) , len(sdf)) )],
+            'type':'bar','name':'Sabre - Competitor',
+            'marker': {'color':'green'}
+
+        } ,1, 1)
+
+        return fig
+
+    @app.callback(
+        dash.dependencies.Output('time_vs_fare-graph', 'figure'),
+        [dash.dependencies.Input('Provider', 'values'),Input('datatable-gapminder', 'rows'), Input('datatable-gapminder', 'selected_row_indices')])
+    def update_image_src(selector,rows, selected_row_indices):
+        fig = plotly.tools.make_subplots( rows=1, cols=1, subplot_titles=('Time vs Fare',  ), shared_xaxes=False,shared_yaxes=False)
+
+        if len(selected_row_indices) != 0: rows = [rows[x] for x in selected_row_indices]
+
+        df = pd.DataFrame(rows)
+        df = df[ df['provider'].isin( selector ) ]
+
+        for provider in selector:
+            fig.append_trace({
+                'x': df[(df['provider'] == provider ) & (df['is_duplicate']=='N')]['fare'],
+                'y': df[(df['provider'] == provider ) & (df['is_duplicate']=='N')]['travel_time'],
+                'type': 'scatter', 'mode': 'markers', 'name':provider, 'marker': {'color': {'sabre':'red','competitor':'blue','overlap':'green'}[provider] }
+            }, 1, 1)
+        fig.append_trace({
+            'x': df[(df['is_duplicate']=='Y')]['fare'],
+            'y': df[(df['is_duplicate']=='Y')]['travel_time'],
+            'type': 'scatter', 'mode': 'markers', 'name':'overlap', 'marker': {'color':'green'},
+        }, 1, 1)
+
+        return fig
+
+
+    @app.callback(dash.dependencies.Output('overlap-graph', 'figure'),
+        [dash.dependencies.Input('Provider', 'values'),Input('datatable-gapminder', 'rows'), Input('datatable-gapminder', 'selected_row_indices')])
+    def update_image_src(selector, rows, selected_row_indices):
+
+        fig = plotly.tools.make_subplots( rows=1, cols=1, subplot_titles=('Options Distribution by Carrier',  ), shared_xaxes=False,shared_yaxes=False)
+
+        if len(selected_row_indices) != 0: rows = [rows[x] for x in selected_row_indices]
+        df = pd.DataFrame(rows)
+        df = df[ df['provider'].isin( selector ) ]
+        providers = pd.unique(df['provider'])
+        aux_count = 0
+        for provider in providers:
+            aux_df = df[df['provider']=='competitor']
+            fig.append_trace({
+                'x': aux_df['id'], #'x': [i for i in range(aux_count, len(aux_df) + aux_count)],#'x':df[df['provider']==provider]['id'],
+                'y': [1 for i in list(range(aux_df.shape[0]))],
+                'type': 'bar',
+                'name':provider,
+                'marker': {'color': {'competitor':'blue','sabre':'red'}[provider]}
+            } ,1, 1)
+            aux_count += len(aux_df)
+            
+        aux_df = df[df['is_duplicate']=='Y']
+        fig.append_trace({
+            'x': aux_df['id'],# 'x': [i for i in range(aux_count, len(aux_df) + aux_count)],  #'x':df[df['is_duplicate']=='Y']['id'],
+            'y': [1 for i in list(range(aux_df.shape[0]))],
+            'type': 'bar',
+            'name':'overlap',
+            'marker': {'color': 'green'}
+        } ,1, 1)
+
+        return fig
+
+    @app.callback(dash.dependencies.Output('overlap_pie-graph', 'figure'),
+    [dash.dependencies.Input('time_vs_fare-graph', 'figure'),Input('datatable-gapminder', 'rows'),Input('datatable-gapminder', 'selected_row_indices')])
+    def update_image_src2(selector, rows, selected_row_indices):
+
+
+        fig = plotly.tools.make_subplots( rows=4, cols=1, subplot_titles=('Time vs Fare',  ), shared_xaxes=False,shared_yaxes=False)
+
+        if len(selected_row_indices) != 0: rows = [rows[x] for x in selected_row_indices]
+        df = pd.DataFrame(rows)
+        duplicate_dict = dict((df['is_duplicate'].value_counts()))
+
+        data = Data([
+            go.Pie(values=list(duplicate_dict.values()), labels=list(duplicate_dict.keys()))
+         ])
+        return go.Figure(data=data)
+
+
+    def test():
+        return 'TEST'
+
+    if __name__ == '__main__':
+            app.run_server(debug=True)
+
+    return app
+
+
+
+class DashboardDetail(SelectRelatedMixin, generic.DetailView):
+    model = models.Dashboard
+    select_related = ()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['app'] = getapp(str(context['dashboard']))
+        return context
+
+
+
+
+
+class DashboardListView(ListView):
+    model = Dashboard
+    template_name = "dashboard/dashboard_list.html"
+    select_related = ()
+
+    def get_queryset(self):
+        return Dashboard.objects.all()
+
+
+
+
+class CreateDashboard(LoginRequiredMixin,SelectRelatedMixin,generic.CreateView):
+    model = models.Dashboard
+    #template_name = "bfm_app/bfm.html"
+    fields = ("title", 'description','bfml_file')
+
+
+
+def index(request):
+    return render(request, 'dashboard.index.html',{})
+
+##########################
+
+def get_itinerary_sabre(legs):
+    'Builds the Itinerary from Flight columns for Sabre raw data'
+    ob,ib = legs[0],legs[1]
+    try:
+        return '-'.join([f[:2]+ (6-len(f))*'0'+f[2:] for f in ob.split(' - ')+ib.split(' - ')])
+    except Exception as e:
+        pass
+        #print ()'ERROR generating ITinerary',str(e))
+        #print (legs)
+
+def get_itinerary_comp(flights):
+    'Builds the Itinerary from Flight columns for competitor raw data'
+    return  '-'.join([f[:2]+ (6-len(f))*'0'+f[2:] for f in flights if f!=''])
+
+
+def open_dfs(s_path,c_path):
+    'Receives a 2 Ocean raw data file set'
+    'Returns 2 Normalized DFs one per Provider '
+    'Open and creates extra needed columns: fare,itinerary travel time'
+
+    s_cols = ['AP','LOS','market','DCXRFLIGHT','RCXRFLIGHT','TotaltravelTime','fare']
+    c_cols=['AP','LOS','MARKET','KEY_OUT1','KEY_OUT2','KEY_OUT3','KEY_IN1','KEY_IN2','KEY_IN3','TOTALTRAVELTIME','PRICE']
+
+    sdf = pd.read_csv(s_path, usecols=s_cols)
+    cdf = pd.read_csv(c_path, sep=';', usecols=c_cols)
+    cdf = cdf.fillna('')
+    sdf['itinerary'] = sdf[[u'DCXRFLIGHT','RCXRFLIGHT']].apply(get_itinerary_sabre,axis=1)
+    #sdf['itinerary'] = sdf['itinerary'].str.replace(' - ','-')
+
+    if 'KEY_OUT3' in cdf.keys() and 'KEY_IN3' in cdf.keys() :
+        cdf['itinerary'] = cdf[['KEY_OUT1','KEY_OUT2','KEY_OUT3','KEY_IN1','KEY_IN2','KEY_IN3']].apply(get_itinerary_comp,axis=1)
+    else:
+        cdf['itinerary'] = cdf[['KEY_OUT1','KEY_OUT2','KEY_IN1','KEY_IN2']].apply(get_itinerary_comp,axis=1)
+
+    #Cleaning of Columns and renaming
+    sdf.dropna(subset=['TotaltravelTime'], inplace=True)
+    sdf['travel_time'] = sdf[u'TotaltravelTime'].astype(str)
+    cdf['travel_time'] = cdf[u'TOTALTRAVELTIME']
+    cdf.rename(columns={'PRICE':'fare'}, inplace=True)
+    cdf.rename(columns={'MARKET':'market'}, inplace=True)
+    sdf['ap_los'] = sdf['AP'].astype(str) +'_'+sdf['LOS'].astype(str)
+    cdf['ap_los'] = cdf['AP'].astype(str) +'_'+cdf['LOS'].astype(str)
+
+
+
+    sdf = sdf[['itinerary','ap_los','market','travel_time','fare']]
+    cdf = cdf[['itinerary','ap_los','market','travel_time','fare']]
+
+
+    #print ()'Dataframes Open')
+    #print ()'  Number of rows Sabre, Competition: ', str(sdf.shape[0]), str(cdf.shape[0]))
+
+    return [sdf,cdf]
+
+
+def generate_id_list(configuration_file_path='configuration.csv'):
+    qid_list=[]
+    DF = pd.read_csv(configuration_file_path,sep=',') # Used to extract ap,los, onds
+    AP_LOS = DF[['AP','LOS']].astype(str).apply(lambda x: '_'.join(x), axis=1).unique()
+    onds = DF['market'].unique()
+    dates = DF['dates'].unique()
+
+    #print ( str(len(onds)), 'ONDS')
+    #print (str(len(AP_LOS)), 'AP_LOS')
+    #print (str(len(dates)), 'dates')
+
+
+
+    'Generate a concatenation of valid pos, search_dates, ap, los and onds'
+    qid_list +=  ['_'.join([str(date),ond,ap_los]) for date in dates for ond in onds for ap_los in AP_LOS]
+
+    return qid_list
+
+
+def filter_df(sdf, cdf, ap_los=None,market=None, num_options=None,truncate_to_min=False):     #,search_date
+    'Filters big dfs into a a specific dfs for pos, ap, los sdate or ond'
+    if ap_los is not None:
+        sdf = sdf[(sdf['ap_los'] == ap_los ) ]
+        cdf = cdf[(cdf['ap_los'] == ap_los ) ]
+    if market is not None:
+        sdf = sdf[(sdf['market'] == market) ]
+        cdf = cdf[(cdf['market'] == market ) ]
+
+    if truncate_to_min:
+        num_options = min(sdf.shape[0],cdf.shape[0])
+    if num_options is not None:
+        sdf=sdf[:num_options]
+        cdf=cdf[:num_options]
+    return [sdf,cdf]
+
+
+
+def generate_ind_files(override_files=True):
+    files_created = 0
+    'Input: list of ids, combination of pos, search date, ap, los and ond'
+    control_date = '' # Used for controlling if need to open new df or keep using the same as before
+
+    id_list = generate_id_list()
+    for q_id in id_list:
+        s_date,ond,AP,LOS = q_id.split('_')
+        folder = 'Input/'
+        ap_los = AP+'_'+LOS
+        try:
+
+            output_path = s_date + '_' + ond + '_' + AP + '_' + LOS + '.csv'
+            #Control wether the file exists already so to avoid repeating the same task
+            if not os.path.exists(output_path):
+                if ( s_date !=  control_date) :
+
+                    [s_df, c_df] = open_dfs(folder+'sabre_'+s_date+'.csv',folder+'competition_'+s_date+'.csv')
+                #Update both control variables
+                control_date = s_date
+
+                # Filter dataframes based on id
+                [S, C] = filter_df(s_df, c_df, ap_los,market=ond, truncate_to_min=True)
+
+                #Create new DF which will be saved as to new individual file
+                S['provider'] = 'sabre'
+                C['provider'] = 'competitor'
+                S['search_date'] = s_date
+                C['search_date'] = s_date
+                S['ond'] = ond
+                C['ond'] = ond
+
+
+                SC = pd.concat([S,C])
+                #SC =process_SC(SC)
+                output_path = 'Output/'+s_date+'_'+ond+'_'+AP+'_'+LOS + '.csv'
+                #Control wether the file exists already so to avoid repeating the same task
+                if override_files:
+
+                    pd.DataFrame(SC).to_csv(output_path, sep=',')
+                elif not os.path.exists(output_path):
+                    pd.DataFrame(SC).to_csv(output_path, sep=',')
+                    #print 'Saved to ' , output_path
+                else: pass #print 'File exist already.'
+                files_created+=1
+                #print 'Processed ',str(files_created), ' of ', str(len(qid_list))
+
+        except Exception as e: print ( str(e))
+
+
+
+def get_airline_odered_set(itinerary):
+    return sorted(list(set([flight[:2] for flight in itinerary.split('-')])))
+
+
+def get_alliance(itinerary):
+    retorno = []
+    al2all = pd.read_csv('alliances.csv',index_col='airline').to_dict()
+    airlines = [flight[:2] for flight in itinerary.split('-')]
+    for airline in airlines:
+
+        if airline in al2all['alliance']: retorno.append( al2all['alliance'][airline] )
+    else: retorno.append('na')
+    return retorno
+
+##############################
+# Step ii
+
+
+
+def advanced_processing():
+    folder = 'Output/'
+    output_path = 'Processed/'
+    for f in os.listdir(folder):
+        f_name = f.split('.')[0]
+
+        df = pd.read_csv(folder+f)
+        df["is_duplicate"]= df.duplicated(subset=['itinerary'],keep=False)
+        df['price_rank_abs'] = df['fare'].rank(ascending=1,method='dense')
+        df['time_rank_abs'] = df['travel_time'].rank(ascending=1,method='dense')
+        df['price_rank'] = df.groupby('provider')['fare'].rank(ascending=1,method='dense')
+        df['time_rank'] = df.groupby('provider')['travel_time'].rank(ascending=1,method='dense')
+
+
+        sdf = df[df['provider']=='sabre']
+        cdf = df[df['provider']!='sabre']
+
+        df.to_csv(output_path+'1/'+f_name+'-1.csv', sep=',')
+
+        result = pd.merge(sdf, cdf, how='outer', on=['itinerary', 'itinerary'] ,suffixes=['_sabre','_competitor'] )
+
+
+
+        result.drop([ 'market_competitor', 'is_duplicate_competitor',
+                       u'market_competitor','market_sabre', 'is_duplicate_sabre',
+                    #'ap_competitor',u'ap_sabre', u'los_sabre','los_competitor',,u'search_date_competitor',
+                    ],axis=1,inplace=True)
+        result.fillna('')
+
+        result['fare_difference'] = (result['fare_sabre']-result['fare_competitor'])/result['fare_sabre']
+
+        result['search_date'] = result[['search_date_sabre', 'search_date_competitor']].astype(str).apply(lambda x: ''.join(x).replace('nan',''), axis=1)
+        result['ap_los'] = result[['ap_los_sabre', 'ap_los_competitor']].astype(str).apply(lambda x: ''.join(x).replace('nan',''), axis=1)
+        result['ond'] = result[['ond_sabre', 'ond_competitor']].astype(str).apply(lambda x: ''.join(x).replace('nan','')[:6], axis=1)
+        result['provider'] = result[['provider_sabre', 'provider_competitor']].astype(str).apply(lambda x: '_'.join(x), axis=1)
+        #result['provider'] = result['provider'].apply(lambda x: 'both' if '_' in x else x)
+        result['alliance'] = result['itinerary'].apply(lambda x: get_alliance(x))
+
+        result.drop(['provider_competitor','provider_sabre' ],axis=1,inplace=True)
+
+        result2= result[['search_date','ond','ap_los','provider','itinerary',
+                         'fare_sabre','fare_competitor','fare_difference',
+                        'travel_time_sabre','travel_time_competitor',
+                         'price_rank_abs_sabre','price_rank_abs_competitor',
+                         'time_rank_sabre', 'time_rank_competitor',
+                         'time_rank_abs_sabre', 'time_rank_abs_competitor',
+                         'travel_time_sabre', 'travel_time_competitor'
+
+                        ]]
+        result2.to_csv(output_path+'2/'+f_name+'-2.csv', sep=',')
+
+
+
+########################
+# Step iii
+# Generate the summary file
+################################
+
+
+def process_summary():
+    dicts = []
+    input_dir = 'Processed/2/'
+    for file_path in os.listdir(input_dir):
+        file_name = file_path.split('.')[0]
+        di = {'file_name':file_name}
+        #print 'Processing: ', file_name
+
+
+        df = pd.read_csv(input_dir+file_path, sep=',')
+
+        #Split based on provider
+        sabre_options = df[df['provider'].str.contains('sabre')]
+        competitor_options = df[df['provider'].str.contains('competitor')]
+
+
+        # Mean and STD Fare
+        di['competitor_fare_mean']=competitor_options['fare_competitor'].mean()
+        di['sabre_fare_mean']=sabre_options['fare_sabre'].mean()
+        di['competitor_fare_std']=competitor_options['fare_competitor'].std()
+        di['sabre_fare_std']=sabre_options['fare_sabre'].std()
+
+
+        #Get cheapest option per provider
+        di['competition_cheapest']=competitor_options.loc[competitor_options['fare_competitor'].idxmin()]['fare_competitor']
+        di['sabre_cheapest']=sabre_options.loc[sabre_options['fare_sabre'].idxmin()]['fare_sabre']
+
+
+         #Get travel time mean and std
+        di['competition_time_mean']=competitor_options['travel_time_competitor'].mean()
+        di['sabre_time_mean=sabre'] = sabre_options['travel_time_sabre'].mean()
+        di['competition_time_std']=competitor_options['travel_time_competitor'].std()
+        di['sabre_time_std']=sabre_options['travel_time_sabre'].std()
+
+
+        di['sabre_time_max'] = sabre_options['travel_time_sabre'].max()
+        di['sabre_time_min'] = sabre_options['travel_time_sabre'].min()
+        di['competition_time_max']  = competitor_options['travel_time_competitor'].max()
+        di['competition_time_min']  = competitor_options['travel_time_competitor'].min()
+
+
+        di['sabre_only'] = df['provider'].value_counts()['sabre_nan']
+        di['competitor_only'] = df['provider'].value_counts()['nan_competitor']
+        di['both'] = df['provider'].value_counts()['sabre_competitor']
+
+        di['overlap']= di['both']*100.0 / (di['sabre_only'] + di['competitor_only'] - di['both']*2)
+
+
+        dicts.append(di)
+
+
+    out_df = pd.DataFrame(dicts)
+    out_df.to_csv('OUTPUT.CSV' )
+
+
+
+
+############################

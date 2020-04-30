@@ -1,0 +1,55 @@
+2018-11-01 10:42:36.026594,Folder Scaffold dONE: dashboard/static/benchmark/23
+2018-11-01 10:42:36.026594,Write on Templates
+2018-11-01 10:42:36.028595,->OK.
+2018-11-01 10:42:36.029595,Setting Configuration File.
+2018-11-01 10:42:36.031596,-> {'repeat': '0', 'origin': 'LON', 'destination': 'MVD', 'dep_date': '2018-11-08', 'ret_date': '2018-11-15'}
+2018-11-01 10:42:36.033597,Writting Payload 1.
+2018-11-01 10:42:36.035598,Sending Payload 1.
+2018-11-01 10:42:39.701063,Saving RS Payload 1.
+2018-11-01 10:42:39.706065,Writting Payload 2.
+2018-11-01 10:42:39.708066,Sending Payload 2.
+2018-11-01 10:42:40.965569,Saving RS Payload 2.
+2018-11-01 10:42:40.969571,Creating Individual Dataframes
+2018-11-01 10:42:41.021591,->OK.
+2018-11-01 10:42:41.089619,->OK.
+2018-11-01 10:42:41.091619,-> {'repeat': '1', 'origin': 'LON', 'destination': 'MVD', 'dep_date': '2018-11-08', 'ret_date': '2018-11-15'}
+2018-11-01 10:42:41.094621,Writting Payload 1.
+2018-11-01 10:42:41.104625,Sending Payload 1.
+2018-11-01 10:42:42.340119,Saving RS Payload 1.
+2018-11-01 10:42:42.344120,Writting Payload 2.
+2018-11-01 10:42:42.347121,Sending Payload 2.
+2018-11-01 10:42:43.639638,Saving RS Payload 2.
+2018-11-01 10:42:43.683656,Creating Individual Dataframes
+2018-11-01 10:42:43.737677,->OK.
+2018-11-01 10:42:43.781695,->OK.
+2018-11-01 10:42:43.837717,->OK.
+2018-11-01 10:42:43.891739,->OK.
+2018-11-01 10:42:43.892739,-> {'repeat': '2', 'origin': 'LON', 'destination': 'MVD', 'dep_date': '2018-11-08', 'ret_date': '2018-11-15'}
+2018-11-01 10:42:43.894740,Writting Payload 1.
+2018-11-01 10:42:43.897741,Sending Payload 1.
+2018-11-01 10:42:45.156245,Saving RS Payload 1.
+2018-11-01 10:42:45.159246,Writting Payload 2.
+2018-11-01 10:42:45.161247,Sending Payload 2.
+2018-11-01 10:42:46.407745,Saving RS Payload 2.
+2018-11-01 10:42:46.410746,Creating Individual Dataframes
+2018-11-01 10:42:46.482775,->OK.
+2018-11-01 10:42:46.537797,->OK.
+2018-11-01 10:42:46.580814,->OK.
+2018-11-01 10:42:46.637837,->OK.
+2018-11-01 10:42:46.690858,->OK.
+2018-11-01 10:42:46.737877,->OK.
+2018-11-01 10:42:46.738877,Process Summary
+2018-11-01 10:42:46.743879,Opening Configuration File.
+2018-11-01 10:42:46.744880,Processing: 0_LON_MVD_2018-11-08_2018-11-15
+
+2018-11-01 10:42:46.770890,Dataframes opened correctly.
+2018-11-01 10:42:46.777893,Processed correctly.
+2018-11-01 10:42:46.779894,Processing: 1_LON_MVD_2018-11-08_2018-11-15
+
+2018-11-01 10:42:46.800902,Dataframes opened correctly.
+2018-11-01 10:42:46.808905,Processed correctly.
+2018-11-01 10:42:46.809906,Processing: 2_LON_MVD_2018-11-08_2018-11-15
+
+2018-11-01 10:42:46.830914,Dataframes opened correctly.
+2018-11-01 10:42:46.838917,Processed correctly.
+2018-11-01 10:42:46.845920,Summary File Generated.

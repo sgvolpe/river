@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+{% load static %}
+{% load staticfiles %}
+{% load plotly_dash %}
+
+{% block content %}
+  <div class="container">
+    <h1>BFM Details</h1>
+    <h2>{{bfm_rs.title}}</h2>
+    <code>{{bfm_rs.description}}</code>
+    <h6><a href="{% static 'bfm_app/bfm_rs_xml/' %}{{bfm_rs.get_xml_name}}" download>Download xml</a></h6>
+    <h6><a href="{% static 'bfm_app/bfm_rs_df/' %}{{bfm_rs.get_df_name}}" download>Download csv</a></h6>
+  </div>
+  <div class="cl" >s
+      {%if app %}
+        {% plotly_app name="bfm_rs_app"  ratio=1 %}
+      {%else %}
+        <p>We couldn't load the View. Please check.</p>
+      {% endif %}
+  </div>
+{% endblock %}

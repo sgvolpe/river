@@ -1,0 +1,13 @@
+,search_date,ond,ap_los,provider,itinerary,fare_sabre,fare_competitor,fare_difference,travel_time_sabre,travel_time_competitor,price_rank_abs_sabre,price_rank_abs_competitor,time_rank_sabre,time_rank_competitor,time_rank_abs_sabre,itinerary_carrier
+0,20180815,MRUPAR,8_2,sabre_unique,UU0109-UU0975-MD0051-MD0188,1680.91,,,2375.0,,1.0,,5.0,,9.0,MD-UU
+1,20180815,MRUPAR,8_2,sabre_unique,UU0109-UU0975-UU0972-UU0108,1872.76,,,1800.0,,2.0,,1.0,,5.0,UU
+2,20180815,MRUPAR,8_2,sabre_unique,UU0109-UU0975-UU0974-UU0108,1872.76,,,1995.0,,2.0,,2.0,,6.0,UU
+3,20180815,MRUPAR,8_2,sabre_unique,UU0109-UU0975-UU0972-UU0130,1872.76,,,2050.0,,2.0,,3.0,,7.0,UU
+4,20180815,MRUPAR,8_2,sabre_unique,UU0109-UU0975-UU0974-UU0130,1872.76,,,2245.0,,2.0,,4.0,,8.0,UU
+5,20180815,MRUPAR,8_2,sabre_unique,UU0109-UU0975-UU0972-UU0102,1872.76,,,2655.0,,2.0,,6.0,,10.0,UU
+6,20180815,MRUPAR,8_2,competitor_unique,AF5101-AF5098,,2113.67,,,1395.0,,3.0,,4.0,,AF
+7,20180815,MRUPAR,8_2,competitor_unique,AF5101-AF0460,,2113.67,,,1380.0,,3.0,,3.0,,AF
+8,20180815,MRUPAR,8_2,competitor_unique,AF5099-AF5098,,2113.67,,,1365.0,,3.0,,2.0,,AF
+9,20180815,MRUPAR,8_2,competitor_unique,AF5099-AF0460,,2113.67,,,1350.0,,3.0,,1.0,,AF
+10,20180815,MRUPAR,8_2,competitor_unique,MK0034-MK0045,,4337.71,,,1365.0,,4.0,,2.0,,MK
+11,20180815,MRUPAR,8_2,competitor_unique,MK0034-MK0923,,4337.71,,,1350.0,,4.0,,1.0,,MK

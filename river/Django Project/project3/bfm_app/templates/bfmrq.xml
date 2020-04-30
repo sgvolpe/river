@@ -1,0 +1,32 @@
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+                   xmlns:eb="http://www.ebxml.org/namespaces/messageHeader" xmlns:xlink="http://www.w3.org/1999/xlink"
+                   xmlns:xsd="http://www.w3.org/1999/XMLSchema">
+    <SOAP-ENV:Header>
+        <eb:MessageHeader SOAP-ENV:mustUnderstand="1"
+                          eb:version="2.0">
+            <eb:ConversationId>{{conversationId}}</eb:ConversationId>
+            <eb:From>
+                <eb:PartyId type="urn:x12.org:IO5:01">{{from}}</eb:PartyId>
+            </eb:From>
+            <eb:To>
+                <eb:PartyId type="urn:x12.org:IO5:01">{{to}}</eb:PartyId>
+            </eb:To>
+            <eb:CPAId>{{pcc}}</eb:CPAId>
+            <eb:Service eb:type="OTA">BargainFinderMaxService</eb:Service>
+            <eb:Action>{{BargainAction}}</eb:Action>
+            <eb:MessageData>
+                <eb:MessageId>{{messageId}}</eb:MessageId>
+                <eb:Timestamp>{{timestamp}}</eb:Timestamp>
+                <eb:TimeToLive>{{ttl}}</eb:TimeToLive>
+            </eb:MessageData>
+        </eb:MessageHeader>
+        <wsse:Security xmlns:wsse="http://schemas.xmlsoap.org/ws/2002/12/secext"
+                       xmlns:wsu="http://schemas.xmlsoap.org/ws/2002/12/utility">
+            <wsse:BinarySecurityToken valueType="String" EncodingType="wsse:Base64Binary">{{securityToken}}</wsse:BinarySecurityToken>
+        </wsse:Security>
+
+    </SOAP-ENV:Header>
+    <SOAP-ENV:Body>
+        {{fullRequest|safe}}
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

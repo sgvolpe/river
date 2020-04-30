@@ -1,0 +1,112 @@
+2018-11-01 10:59:00.227244,Folder Scaffold dONE: dashboard/static/benchmark/25
+2018-11-01 10:59:00.227244,Write on Templates
+2018-11-01 10:59:00.232246,->OK.
+2018-11-01 10:59:00.233246,Setting Configuration File.
+2018-11-01 10:59:00.235247,-> {'repeat': '0', 'origin': 'LON', 'destination': 'SYD', 'dep_date': '2018-11-08', 'ret_date': '2018-11-23'}
+2018-11-01 10:59:00.237248,Writting Payload 1.
+2018-11-01 10:59:00.240249,Sending Payload 1.
+2018-11-01 10:59:04.459936,Saving RS Payload 1.
+2018-11-01 10:59:04.462938,Writting Payload 2.
+2018-11-01 10:59:04.464938,Sending Payload 2.
+2018-11-01 10:59:05.836487,Saving RS Payload 2.
+2018-11-01 10:59:05.840488,-> {'repeat': '0', 'origin': 'LON', 'destination': 'SYD', 'dep_date': '2018-12-01', 'ret_date': '2018-12-16'}
+2018-11-01 10:59:05.842489,Writting Payload 1.
+2018-11-01 10:59:05.846491,Sending Payload 1.
+2018-11-01 10:59:09.222841,Saving RS Payload 1.
+2018-11-01 10:59:09.228843,Writting Payload 2.
+2018-11-01 10:59:09.230844,Sending Payload 2.
+2018-11-01 10:59:10.703433,Saving RS Payload 2.
+2018-11-01 10:59:10.705434,-> {'repeat': '0', 'origin': 'LON', 'destination': 'MAD', 'dep_date': '2018-11-08', 'ret_date': '2018-11-23'}
+2018-11-01 10:59:10.706434,Writting Payload 1.
+2018-11-01 10:59:10.707434,Sending Payload 1.
+2018-11-01 10:59:13.549571,Saving RS Payload 1.
+2018-11-01 10:59:13.554573,Writting Payload 2.
+2018-11-01 10:59:13.557574,Sending Payload 2.
+2018-11-01 10:59:15.094188,Saving RS Payload 2.
+2018-11-01 10:59:15.097190,-> {'repeat': '0', 'origin': 'LON', 'destination': 'MAD', 'dep_date': '2018-12-01', 'ret_date': '2018-12-16'}
+2018-11-01 10:59:15.099190,Writting Payload 1.
+2018-11-01 10:59:15.102192,Sending Payload 1.
+2018-11-01 10:59:18.314476,Saving RS Payload 1.
+2018-11-01 10:59:18.316477,Writting Payload 2.
+2018-11-01 10:59:18.318478,Sending Payload 2.
+2018-11-01 10:59:19.411915,Saving RS Payload 2.
+2018-11-01 10:59:19.414916,-> {'repeat': '0', 'origin': 'LON', 'destination': 'MIA', 'dep_date': '2018-11-08', 'ret_date': '2018-11-23'}
+2018-11-01 10:59:19.417917,Writting Payload 1.
+2018-11-01 10:59:19.419918,Sending Payload 1.
+2018-11-01 10:59:23.805672,Saving RS Payload 1.
+2018-11-01 10:59:23.810674,Writting Payload 2.
+2018-11-01 10:59:23.813675,Sending Payload 2.
+2018-11-01 10:59:25.054171,Saving RS Payload 2.
+2018-11-01 10:59:25.057172,-> {'repeat': '0', 'origin': 'LON', 'destination': 'MIA', 'dep_date': '2018-12-01', 'ret_date': '2018-12-16'}
+2018-11-01 10:59:25.058172,Writting Payload 1.
+2018-11-01 10:59:25.061174,Sending Payload 1.
+2018-11-01 10:59:28.867696,Saving RS Payload 1.
+2018-11-01 10:59:28.870697,Writting Payload 2.
+2018-11-01 10:59:28.872698,Sending Payload 2.
+2018-11-01 10:59:30.153210,Saving RS Payload 2.
+2018-11-01 10:59:30.157211,-> {'repeat': '0', 'origin': 'LON', 'destination': 'KRK', 'dep_date': '2018-11-08', 'ret_date': '2018-11-23'}
+2018-11-01 10:59:30.158212,Writting Payload 1.
+2018-11-01 10:59:30.160212,Sending Payload 1.
+2018-11-01 10:59:32.951328,Saving RS Payload 1.
+2018-11-01 10:59:32.955330,Writting Payload 2.
+2018-11-01 10:59:32.959332,Sending Payload 2.
+2018-11-01 10:59:34.402909,Saving RS Payload 2.
+2018-11-01 10:59:34.405910,-> {'repeat': '0', 'origin': 'LON', 'destination': 'KRK', 'dep_date': '2018-12-01', 'ret_date': '2018-12-16'}
+2018-11-01 10:59:34.406910,Writting Payload 1.
+2018-11-01 10:59:34.408911,Sending Payload 1.
+2018-11-01 10:59:36.788863,Saving RS Payload 1.
+2018-11-01 10:59:36.791864,Writting Payload 2.
+2018-11-01 10:59:36.795866,Sending Payload 2.
+2018-11-01 10:59:38.152408,Saving RS Payload 2.
+2018-11-01 10:59:38.158410,Creating Individual Dataframes
+2018-11-01 10:59:38.196426,->OK.
+2018-11-01 10:59:38.239443,->OK.
+2018-11-01 10:59:38.288462,->OK.
+2018-11-01 10:59:38.328478,->OK.
+2018-11-01 10:59:38.358490,->OK.
+2018-11-01 10:59:38.392504,->OK.
+2018-11-01 10:59:38.422516,->OK.
+2018-11-01 10:59:38.454529,->OK.
+2018-11-01 10:59:38.492544,->OK.
+2018-11-01 10:59:38.526558,->OK.
+2018-11-01 10:59:38.562572,->OK.
+2018-11-01 10:59:38.606590,->OK.
+2018-11-01 10:59:38.647606,->OK.
+2018-11-01 10:59:38.691624,->OK.
+2018-11-01 10:59:38.736642,->OK.
+2018-11-01 10:59:38.784661,->OK.
+2018-11-01 10:59:38.786662,Process Summary
+2018-11-01 10:59:38.791664,Opening Configuration File.
+2018-11-01 10:59:38.792664,Processing: 0_LON_SYD_2018-11-08_2018-11-23
+
+2018-11-01 10:59:38.813672,Dataframes opened correctly.
+2018-11-01 10:59:38.820675,Processed correctly.
+2018-11-01 10:59:38.821676,Processing: 0_LON_SYD_2018-12-01_2018-12-16
+
+2018-11-01 10:59:38.842684,Dataframes opened correctly.
+2018-11-01 10:59:38.850687,Processed correctly.
+2018-11-01 10:59:38.851688,Processing: 0_LON_MAD_2018-11-08_2018-11-23
+
+2018-11-01 10:59:38.871696,Dataframes opened correctly.
+2018-11-01 10:59:38.878698,Processed correctly.
+2018-11-01 10:59:38.879699,Processing: 0_LON_MAD_2018-12-01_2018-12-16
+
+2018-11-01 10:59:38.899707,Dataframes opened correctly.
+2018-11-01 10:59:38.907710,Processed correctly.
+2018-11-01 10:59:38.908710,Processing: 0_LON_MIA_2018-11-08_2018-11-23
+
+2018-11-01 10:59:38.928718,Dataframes opened correctly.
+2018-11-01 10:59:38.935721,Processed correctly.
+2018-11-01 10:59:38.936722,Processing: 0_LON_MIA_2018-12-01_2018-12-16
+
+2018-11-01 10:59:38.956730,Dataframes opened correctly.
+2018-11-01 10:59:38.964733,Processed correctly.
+2018-11-01 10:59:38.965733,Processing: 0_LON_KRK_2018-11-08_2018-11-23
+
+2018-11-01 10:59:38.987742,Dataframes opened correctly.
+2018-11-01 10:59:38.995745,Processed correctly.
+2018-11-01 10:59:38.995745,Processing: 0_LON_KRK_2018-12-01_2018-12-16
+
+2018-11-01 10:59:39.016754,Dataframes opened correctly.
+2018-11-01 10:59:39.023756,Processed correctly.
+2018-11-01 10:59:39.029759,Summary File Generated.

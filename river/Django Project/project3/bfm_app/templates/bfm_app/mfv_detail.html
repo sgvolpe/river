@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+{% load static %}
+{% load staticfiles %}
+{% load plotly_dash %}
+
+{% block content %}
+  <div class="container">
+    <h1>mfv Details</h1>
+    <h2>{{mfv.title}}</h2>
+    <h6><a href="{% static 'bfm_app/bfm_rs_xml/' %}{{bfm_rs.get_xml_name}}" download>Download xml</a></h6>
+  </div>
+  <div class="container" >
+    {% plotly_app name="mfv_app"  ratio=1 %}
+      {%if app %}
+        {% plotly_app name="mfv_app"  ratio=1 %}
+      {%else %}
+        <p>We couldn't load the View. Please check.</p>
+      {% endif %}
+  </div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+{% load static %}
+{% load staticfiles %}
+{% load plotly_dash %}
+
+
+<link rel="stylesheet" href="{% static 'css/master.css' %}">
+{% block content %}
+  <div class="container">
+    <div class="col-xs-12">
+      <h2>ancillariescomparison - {{ancillariescomparison.title}}</h2>
+      <div class="col-xs-8">
+        <h4>{{ancillariescomparison.description}}</h4>
+      </div>
+    </div>
+    <h4>../{{ancillariescomparison.bookings_file.url}}</h4>
+    <h6><a href="{% static 'ancillaries_comparison/' %}{{ancillariescomparison.pk}}/master_df.csv" download>Download Ancillaries Matrix</a></h6>
+    <h6><a href="{% static 'ancillaries_comparison/' %}{{ancillariescomparison.pk}}/master2_sum_bookings.csv" download>Download Totals</a></h6>
+    <h6><a href="{% static 'ancillaries_comparison/' %}{{ancillariescomparison.pk}}/bookings.csv" download>Download Totals</a></h6>
+    <div class="cl">
+      {%if app %}
+        {% plotly_app name="ancillaries_app" ratio=1   %}
+      {%else %}
+        <p>We couldn't load the Dashboard. Please check.</p>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

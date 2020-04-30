@@ -1,0 +1,13 @@
+# setup github.com account | sgvolpe
+# download git-scm.com
+#
+#
+# conda create --name riverEnv
+conda activate riverEnv
+django-admin startproject river
+python manage.py createsuperuser|sgv|SUPER@jabon1
+
+import faker
+
+pip freeze > requirements.txt
+pip install -r requirements.txt --no-index --find-links file:///tmp/packages

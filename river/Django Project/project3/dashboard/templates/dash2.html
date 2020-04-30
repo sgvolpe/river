@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% load bootstrap3 %}
+{% load plotly_dash %}
+
+
+  {% block content %}
+    {% plotly_app name="dash2"  ratio=1 use_frameborder='0'%}
+  {% endblock %}

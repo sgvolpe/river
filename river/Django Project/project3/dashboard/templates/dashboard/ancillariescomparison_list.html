@@ -1,0 +1,25 @@
+
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+{% block content %}
+
+  <div class="container">
+    <h1>Ancillaries</h1>
+    <div class="col-md-8">
+      <a href="{% url 'dashboard:ancillariescomparison_new' %}">Create New</a>
+    <div/>
+    <div class="col-md-8">
+    	<ul>
+        {% for dash in ancillariescomparison_list %}
+        <li class="group li-with-bullet">
+					<a href="{% url 'dashboard:ancillariescomparison_view' pk=dash.pk %}">{{dash.id}} - {{dash.description}}</a>
+				</li>
+        <a href="#"></a>
+    	{% endfor %}
+      </ul>
+
+    </div>
+  </div>
+
+{% endblock %}

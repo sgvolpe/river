@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+{% extends 'base.html'%}
+{% load staticfiles %}
+
+
+{% block content %}
+
+
+  <h1>Date Generator</h1>
+  <div class="container">
+    <h3>Fill out the form:</h3>
+    <form class="" method="post" >
+      {% csrf_token %}
+      <label for="aps">APs</label>
+      <input type="text" id="ap" name="ap" value="2,4">
+      <label for="los">LOS</label>
+      <input type="text" id="los" name="los" value="5,10,15">
+      <input type="button" id="generate-dates"name="" value="Generate">
+      <div class="zero-clipboard">
+      <span class="btn-clipboard" data-clipboard-target="#retorno" title="Copy to clipboard">
+        <span class="glyphicon glyphicon-share" aria-hidden="true">COpy</span>
+    </span>
+</div>
+      <textarea id="retorno" rows="8" cols="80"></textarea>
+    </form>
+   </div>
+  <script type="text/javascript">
+
+    function addDays(date, days) {
+      var result = new Date(date) ;
+      result.setDate(result.getDate() + days) ;
+      return result ;
+    } ;
+
+    function formatDate(date_to_parse){
+      var dd = date_to_parse.getDate();
+      var mm = date_to_parse.getMonth()+1;
+      var yyyy = date_to_parse.getFullYear();
+      if(dd<10){dd='0'+dd ;} ;
+      if(mm<10){mm='0'+mm ;} ;
+
+      return yyyy +'-'+mm+ '-'+dd ;
+    } ;
+
+    function generate_dates(){
+      var today = new Date();
+      today_date = formatDate(today)
+
+      var ap_list = $('#ap').val().replace(/\s+/g,"").split(",") ;
+      var los_list = $('#los').val().replace(/\s+/g,"").split(",") ;
+      retorno = []
+      $.each(ap_list,function(id,ap){
+          ap = parseInt(ap) ;
+          if(Number.isInteger(ap)){
+            $.each(los_list,function(id2,los){
+              los = parseInt(los) ;
+              if(Number.isInteger(los)){
+                retorno.push( formatDate( addDays(today_date, ap ) ) +'/'+ formatDate( addDays(today_date, ap + los ) ) ) ;
+              } ;
+            }) ;
+          }
+      }) ;
+      return retorno
+    } ;
+
+    function copy_content_to_clipboard(element_css){
+      $(element_css).select();
+      document.execCommand("copy");
+
+    } ;
+    $('#generate-dates').click(function(){
+      $('#retorno').val() ;
+      $('#retorno').val(generate_dates()) ;
+      //copy_content_to_clipboard('#retorno') ;
+
+    }) ;
+
+  </script>
+{% endblock %}

@@ -1,0 +1,35 @@
+activate env in py3 and django2.1
+start project
+start app
+
+
+
+templates folder static folder
+
+
+python manage.py createsuperuser
+
+
+#### INSTALLS ####
+set https_proxy=https://sg0216333:Tableta2@123@www-ad-proxy.sabre.com:80
+
+python -m pip install --upgrade pip
+pip install django-bootstrap3
+pip install numpy
+pip install lxml
+pip install pandas
+
+pip install sklearn
+pip install django-multiselectfield
+
+
+
+####################
+# Server
+####################
+python manage.py migrate
+python manage.py makemigrations
+python manage.py migrate
+
+activate myEnv
+pyhon manage.py runserver

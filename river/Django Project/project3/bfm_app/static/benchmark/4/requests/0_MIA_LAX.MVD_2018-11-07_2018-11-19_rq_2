@@ -1,0 +1,96 @@
+<OTA_AirLowFareSearchRQ xmlns="http://www.opentravel.org/OTA/2003/05" Version="3.0.0">
+    <POS>
+        <Source PseudoCityCode="WE9G">
+            <RequestorID ID="1" Type="1">
+                <CompanyName Code="TN">ABC Travel Service</CompanyName>
+            </RequestorID>
+        </Source>
+    </POS>
+    <OriginDestinationInformation RPH="1">
+        <DepartureDateTime>2018-11-07T11:00:00</DepartureDateTime>
+        <DepartureWindow>00002359</DepartureWindow>
+        <OriginLocation LocationCode="MIA"/>
+        <DestinationLocation LocationCode="LAX.MVD"/>
+        <TPA_Extensions>
+            <SegmentType Code="O"/>
+        </TPA_Extensions>
+    </OriginDestinationInformation>
+    <OriginDestinationInformation RPH="2">
+        <DepartureDateTime>2018-11-19T11:00:00</DepartureDateTime>
+        <DepartureWindow>00002359</DepartureWindow>
+        <OriginLocation LocationCode="LAX.MVD"/>
+        <DestinationLocation LocationCode="MIA"/>
+        <TPA_Extensions>
+            <SegmentType Code="O"/>
+        </TPA_Extensions>
+    </OriginDestinationInformation>
+    <TravelPreferences ValidInterlineTicket="false">
+        <CabinPref Cabin="Y" PreferLevel="Preferred"/>
+        <TPA_Extensions>
+            <TripType Value="Return"/>
+            <LongConnectTime Enable="true" Max="1439" Min="780"/>
+		
+            <XOFares Value="true"/>
+ <ValidatingCarrier>
+                <Preference Code="AS" Level="Unacceptable"/>
+                <Preference Code="B6" Level="Unacceptable"/>
+                <Preference Code="JQ" Level="Unacceptable"/>
+                <Preference Code="NK" Level="Unacceptable"/>
+                <Preference Code="TK" Level="Unacceptable"/>
+            </ValidatingCarrier>
+		      <FlexibleFares>
+        <FareParameters>
+          <PassengerType Code="MIL"/>
+        </FareParameters>
+        <FareParameters>
+          <PassengerType Code="ITX"/>
+        </FareParameters>
+        <FareParameters>
+          <PassengerType Code="ADT"/>          
+        </FareParameters>
+      
+	   <FareParameters>
+          <PassengerType Code="JCB"/>          
+        </FareParameters>
+      </FlexibleFares>
+           
+        </TPA_Extensions>
+    </TravelPreferences>
+    <TravelerInfoSummary>
+        <SeatsRequested>1</SeatsRequested>
+       
+        <AirTravelerAvail>
+            <PassengerTypeQuantity Code="ADT" Quantity="1">
+                <TPA_Extensions>
+                    <VoluntaryChanges Match="Info"/>
+                </TPA_Extensions>
+            </PassengerTypeQuantity>
+        </AirTravelerAvail>
+        <PriceRequestInformation CurrencyCode="EUR">
+            <AccountCode Code="ABC01"/>
+            <AccountCode Code="DPD12"/>
+            <TPA_Extensions>
+                <Priority>
+                    <Price Priority="1"/>
+                    <DirectFlights Priority="4"/>
+                    <Time Priority="2"/>
+                    <Vendor Priority="3"/>
+                </Priority>
+            </TPA_Extensions>
+        </PriceRequestInformation>
+    </TravelerInfoSummary>
+    <TPA_Extensions>
+        <IntelliSellTransaction>
+            <RequestType Name="100ITINS"/>		      				</IntelliSellTransaction>
+        <DiversityControl>
+            <LowFareBucket Options="5"/>
+            <Dimensions PriceWeight="1">
+                <Carrier Weight="10">
+                    <Default Options="4"/>
+                    <Override Code="AA" Options="1"/>
+                </Carrier>
+                <InboundOutboundPairing Weight="10"/>
+            </Dimensions>
+        </DiversityControl>
+    </TPA_Extensions>
+</OTA_AirLowFareSearchRQ>

@@ -1,0 +1,4 @@
+,ArrivalAirport,ArrivalDateTime,DepartureAirport,DepartureDateTime,additional_prices,booking_classes,currency,idx,itinerary,itinerary_operating,marriage_indicators,mktg_optg_set,multi_ticket,option_number,price,travel_time
+0,MVD,2018-10-05T16:45:00,AEP,2018-10-05T16:00:00,[],M,USD,0,AR2385--AR2382,AU2385--AU2382,O,"[AR(AU), AR(AU)]",False,1,446.14,55-45
+1,MVD,2018-10-05T19:55:00,AEP,2018-10-05T19:10:00,[],M,USD,1,AR2385--AR2396,AU2385--AU2396,O,"[AR(AU), AR(AU)]",False,2,446.14,55-45
+2,MVD,2018-10-05T19:55:00,AEP,2018-10-05T19:10:00,[],K,USD,2,AR2395--AR2396,AU2395--AU2396,O,"[AR(AU), AR(AU)]",False,3,485.94,55-45

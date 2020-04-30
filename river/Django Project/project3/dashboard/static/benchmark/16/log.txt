@@ -1,0 +1,177 @@
+sdf
+2018-11-01 11:00:32.190983,Folder Scaffold dONE: dashboard/static/benchmark/16
+2018-11-01 11:00:32.191984,Write on Templates
+2018-11-01 11:00:32.193984,->OK.
+2018-11-01 11:00:32.195985,Setting Configuration File.
+2018-11-01 11:00:32.198986,-> {'repeat': '0', 'origin': 'MIA', 'destination': 'LAX', 'dep_date': '2018-11-03', 'ret_date': '2018-11-10'}
+2018-11-01 11:00:32.202988,Sending Payload 1.
+2018-11-01 11:00:36.321635,Saving RS Payload 1.
+2018-11-01 11:00:36.326637,Sending Payload 2.
+2018-11-01 11:00:40.639334,Saving RS Payload 2.
+2018-11-01 11:00:40.644336,-> {'repeat': '0', 'origin': 'MIA', 'destination': 'LAX', 'dep_date': '2018-11-03', 'ret_date': '2018-11-18'}
+2018-11-01 11:00:40.648338,Sending Payload 1.
+2018-11-01 11:00:46.712719,Saving RS Payload 1.
+2018-11-01 11:00:46.719722,Sending Payload 2.
+2018-11-01 11:00:52.836155,Saving RS Payload 2.
+2018-11-01 11:00:52.839156,-> {'repeat': '0', 'origin': 'MIA', 'destination': 'LAX', 'dep_date': '2018-11-04', 'ret_date': '2018-11-11'}
+2018-11-01 11:00:52.840156,Sending Payload 1.
+2018-11-01 11:00:56.415586,Saving RS Payload 1.
+2018-11-01 11:00:56.419588,Sending Payload 2.
+2018-11-01 11:01:02.128854,Saving RS Payload 2.
+2018-11-01 11:01:02.132855,-> {'repeat': '0', 'origin': 'MIA', 'destination': 'LAX', 'dep_date': '2018-11-04', 'ret_date': '2018-11-19'}
+2018-11-01 11:01:02.134856,Sending Payload 1.
+2018-11-01 11:01:29.355663,Saving RS Payload 1.
+2018-11-01 11:01:29.359665,Sending Payload 2.
+2018-11-01 11:01:57.238660,Saving RS Payload 2.
+2018-11-01 11:01:57.240661,-> {'repeat': '0', 'origin': 'MIA', 'destination': 'LAX', 'dep_date': '2018-11-05', 'ret_date': '2018-11-12'}
+2018-11-01 11:01:57.242662,Sending Payload 1.
+2018-11-01 11:02:01.002165,Saving RS Payload 1.
+2018-11-01 11:02:01.007167,Sending Payload 2.
+2018-11-01 11:02:04.816654,Saving RS Payload 2.
+2018-11-01 11:02:04.819655,-> {'repeat': '0', 'origin': 'MIA', 'destination': 'LAX', 'dep_date': '2018-11-05', 'ret_date': '2018-11-20'}
+2018-11-01 11:02:04.821656,Sending Payload 1.
+2018-11-01 11:02:08.193988,Saving RS Payload 1.
+2018-11-01 11:02:08.197990,Sending Payload 2.
+2018-11-01 11:02:11.992484,Saving RS Payload 2.
+2018-11-01 11:02:11.994484,-> {'repeat': '0', 'origin': 'MIA', 'destination': 'LAX', 'dep_date': '2018-11-06', 'ret_date': '2018-11-13'}
+2018-11-01 11:02:11.997486,Sending Payload 1.
+2018-11-01 11:02:30.621890,Saving RS Payload 1.
+2018-11-01 11:02:30.626892,Sending Payload 2.
+2018-11-01 11:02:35.018648,Saving RS Payload 2.
+2018-11-01 11:02:35.020649,-> {'repeat': '0', 'origin': 'MIA', 'destination': 'LAX', 'dep_date': '2018-11-06', 'ret_date': '2018-11-21'}
+2018-11-01 11:02:35.022650,Sending Payload 1.
+2018-11-01 11:02:41.187097,Saving RS Payload 1.
+2018-11-01 11:02:41.209106,Sending Payload 2.
+2018-11-01 11:03:07.746649,Saving RS Payload 2.
+2018-11-01 11:03:07.748649,-> {'repeat': '0', 'origin': 'MIA', 'destination': 'LAX', 'dep_date': '2018-11-07', 'ret_date': '2018-11-14'}
+2018-11-01 11:03:07.750650,Sending Payload 1.
+2018-11-01 11:03:12.007264,Saving RS Payload 1.
+2018-11-01 11:03:12.012266,Sending Payload 2.
+2018-11-01 11:03:15.839737,Saving RS Payload 2.
+2018-11-01 11:03:15.843739,-> {'repeat': '0', 'origin': 'MIA', 'destination': 'LAX', 'dep_date': '2018-11-07', 'ret_date': '2018-11-22'}
+2018-11-01 11:03:15.845739,Sending Payload 1.
+2018-11-01 11:03:23.283695,Saving RS Payload 1.
+2018-11-01 11:03:23.288697,Sending Payload 2.
+2018-11-01 11:03:27.576411,Saving RS Payload 2.
+2018-11-01 11:03:27.578412,-> {'repeat': '0', 'origin': 'LON', 'destination': 'MIA', 'dep_date': '2018-11-03', 'ret_date': '2018-11-10'}
+2018-11-01 11:03:27.580413,Sending Payload 1.
+2018-11-01 11:03:31.117827,Saving RS Payload 1.
+2018-11-01 11:03:31.123830,Sending Payload 2.
+2018-11-01 11:03:34.718267,Saving RS Payload 2.
+2018-11-01 11:03:34.720268,-> {'repeat': '0', 'origin': 'LON', 'destination': 'MIA', 'dep_date': '2018-11-03', 'ret_date': '2018-11-18'}
+2018-11-01 11:03:34.721268,Sending Payload 1.
+2018-11-01 11:03:39.588214,Saving RS Payload 1.
+2018-11-01 11:03:39.591215,Sending Payload 2.
+2018-11-01 11:03:46.964163,Saving RS Payload 2.
+2018-11-01 11:03:46.967165,-> {'repeat': '0', 'origin': 'LON', 'destination': 'MIA', 'dep_date': '2018-11-04', 'ret_date': '2018-11-11'}
+2018-11-01 11:03:46.969165,Sending Payload 1.
+2018-11-01 11:03:51.049797,Saving RS Payload 1.
+2018-11-01 11:03:51.052798,Sending Payload 2.
+2018-11-01 11:03:58.655838,Saving RS Payload 2.
+2018-11-01 11:03:58.658839,-> {'repeat': '0', 'origin': 'LON', 'destination': 'MIA', 'dep_date': '2018-11-04', 'ret_date': '2018-11-19'}
+2018-11-01 11:03:58.687851,Sending Payload 1.
+2018-11-01 11:04:02.531241,Saving RS Payload 1.
+2018-11-01 11:04:02.532242,Sending Payload 2.
+2018-11-01 11:04:06.299598,Saving RS Payload 2.
+2018-11-01 11:04:06.299598,-> {'repeat': '0', 'origin': 'LON', 'destination': 'MIA', 'dep_date': '2018-11-05', 'ret_date': '2018-11-12'}
+2018-11-01 11:04:06.299598,Sending Payload 1.
+2018-11-01 11:04:09.984921,Saving RS Payload 1.
+2018-11-01 11:04:09.994925,Sending Payload 2.
+2018-11-01 11:04:13.737280,Saving RS Payload 2.
+2018-11-01 11:04:13.737280,-> {'repeat': '0', 'origin': 'LON', 'destination': 'MIA', 'dep_date': '2018-11-05', 'ret_date': '2018-11-20'}
+2018-11-01 11:04:13.737280,Sending Payload 1.
+2018-11-01 11:04:17.847779,Saving RS Payload 1.
+2018-11-01 11:04:17.851780,Sending Payload 2.
+2018-11-01 11:04:21.765312,Saving RS Payload 2.
+2018-11-01 11:04:21.770314,-> {'repeat': '0', 'origin': 'LON', 'destination': 'MIA', 'dep_date': '2018-11-06', 'ret_date': '2018-11-13'}
+2018-11-01 11:04:21.772315,Sending Payload 1.
+2018-11-01 11:04:25.316698,Saving RS Payload 1.
+2018-11-01 11:04:25.316698,Sending Payload 2.
+2018-11-01 11:04:29.174166,Saving RS Payload 2.
+2018-11-01 11:04:29.176167,-> {'repeat': '0', 'origin': 'LON', 'destination': 'MIA', 'dep_date': '2018-11-06', 'ret_date': '2018-11-21'}
+2018-11-01 11:04:29.178168,Sending Payload 1.
+2018-11-01 11:04:33.444839,Saving RS Payload 1.
+2018-11-01 11:04:33.449841,Sending Payload 2.
+2018-11-01 11:04:37.774544,Saving RS Payload 2.
+2018-11-01 11:04:37.779546,-> {'repeat': '0', 'origin': 'LON', 'destination': 'MIA', 'dep_date': '2018-11-07', 'ret_date': '2018-11-14'}
+2018-11-01 11:04:37.781547,Sending Payload 1.
+2018-11-01 11:04:41.315933,Saving RS Payload 1.
+2018-11-01 11:04:41.320935,Sending Payload 2.
+2018-11-01 11:04:47.388288,Saving RS Payload 2.
+2018-11-01 11:04:47.391289,-> {'repeat': '0', 'origin': 'LON', 'destination': 'MIA', 'dep_date': '2018-11-07', 'ret_date': '2018-11-22'}
+2018-11-01 11:04:47.393290,Sending Payload 1.
+2018-11-01 11:04:51.855040,Saving RS Payload 1.
+2018-11-01 11:04:51.858041,Sending Payload 2.
+2018-11-01 11:04:57.198075,Saving RS Payload 2.
+2018-11-01 11:04:57.201076,-> {'repeat': '0', 'origin': 'LON', 'destination': 'BCN', 'dep_date': '2018-11-03', 'ret_date': '2018-11-10'}
+2018-11-01 11:04:57.204077,Sending Payload 1.
+2018-11-01 11:04:59.691012,Saving RS Payload 1.
+2018-11-01 11:04:59.701016,Sending Payload 2.
+2018-11-01 11:05:02.323989,Saving RS Payload 2.
+2018-11-01 11:05:02.323989,-> {'repeat': '0', 'origin': 'LON', 'destination': 'BCN', 'dep_date': '2018-11-03', 'ret_date': '2018-11-18'}
+2018-11-01 11:05:02.323989,Sending Payload 1.
+2018-11-01 11:05:05.018967,Saving RS Payload 1.
+2018-11-01 11:05:05.023969,Sending Payload 2.
+2018-11-01 11:05:07.834022,Saving RS Payload 2.
+2018-11-01 11:05:07.834022,-> {'repeat': '0', 'origin': 'LON', 'destination': 'BCN', 'dep_date': '2018-11-04', 'ret_date': '2018-11-11'}
+2018-11-01 11:05:07.834022,Sending Payload 1.
+2018-11-01 11:05:10.421004,Saving RS Payload 1.
+2018-11-01 11:05:10.425006,Sending Payload 2.
+2018-11-01 11:05:13.139006,Saving RS Payload 2.
+2018-11-01 11:05:13.149009,-> {'repeat': '0', 'origin': 'LON', 'destination': 'BCN', 'dep_date': '2018-11-04', 'ret_date': '2018-11-19'}
+2018-11-01 11:05:13.149009,Sending Payload 1.
+2018-11-01 11:05:15.937044,Saving RS Payload 1.
+2018-11-01 11:05:15.937044,Sending Payload 2.
+2018-11-01 11:05:18.604053,Saving RS Payload 2.
+2018-11-01 11:05:18.611056,-> {'repeat': '0', 'origin': 'LON', 'destination': 'BCN', 'dep_date': '2018-11-05', 'ret_date': '2018-11-12'}
+2018-11-01 11:05:18.613057,Sending Payload 1.
+2018-11-01 11:05:21.364151,Saving RS Payload 1.
+2018-11-01 11:05:21.371154,Sending Payload 2.
+2018-11-01 11:05:24.201235,Saving RS Payload 2.
+2018-11-01 11:05:24.206237,-> {'repeat': '0', 'origin': 'LON', 'destination': 'BCN', 'dep_date': '2018-11-05', 'ret_date': '2018-11-20'}
+2018-11-01 11:05:24.209238,Sending Payload 1.
+2018-11-01 11:05:26.747221,Saving RS Payload 1.
+2018-11-01 11:05:26.751222,Sending Payload 2.
+2018-11-01 11:05:29.420223,Saving RS Payload 2.
+2018-11-01 11:05:29.423224,-> {'repeat': '0', 'origin': 'LON', 'destination': 'BCN', 'dep_date': '2018-11-06', 'ret_date': '2018-11-13'}
+2018-11-01 11:05:29.426225,Sending Payload 1.
+2018-11-01 11:05:32.679409,Saving RS Payload 1.
+2018-11-01 11:05:32.680410,Sending Payload 2.
+2018-11-01 11:05:35.464430,Saving RS Payload 2.
+2018-11-01 11:05:35.466431,-> {'repeat': '0', 'origin': 'LON', 'destination': 'BCN', 'dep_date': '2018-11-06', 'ret_date': '2018-11-21'}
+2018-11-01 11:05:35.468432,Sending Payload 1.
+2018-11-01 11:05:38.063395,Saving RS Payload 1.
+2018-11-01 11:05:38.073399,Sending Payload 2.
+2018-11-01 11:05:40.712422,Saving RS Payload 2.
+2018-11-01 11:05:40.715424,-> {'repeat': '0', 'origin': 'LON', 'destination': 'BCN', 'dep_date': '2018-11-07', 'ret_date': '2018-11-14'}
+2018-11-01 11:05:40.717424,Sending Payload 1.
+2018-11-01 11:05:43.297444,Saving RS Payload 1.
+2018-11-01 11:05:43.319452,Sending Payload 2.
+2018-11-01 11:05:46.036492,Saving RS Payload 2.
+2018-11-01 11:05:46.039493,-> {'repeat': '0', 'origin': 'LON', 'destination': 'BCN', 'dep_date': '2018-11-07', 'ret_date': '2018-11-22'}
+2018-11-01 11:05:46.040494,Sending Payload 1.
+2018-11-01 11:05:48.836577,Saving RS Payload 1.
+2018-11-01 11:05:48.840578,Sending Payload 2.
+2018-11-01 11:05:51.647672,Saving RS Payload 2.
+2018-11-01 11:05:51.652674,-> {'repeat': '0', 'origin': 'LON', 'destination': 'SYD', 'dep_date': '2018-11-03', 'ret_date': '2018-11-10'}
+2018-11-01 11:05:51.655675,Sending Payload 1.
+2018-11-01 11:05:56.056388,Saving RS Payload 1.
+2018-11-01 11:05:56.061390,Sending Payload 2.
+2018-11-01 11:05:59.983911,Saving RS Payload 2.
+2018-11-01 11:05:59.986912,-> {'repeat': '0', 'origin': 'LON', 'destination': 'SYD', 'dep_date': '2018-11-03', 'ret_date': '2018-11-18'}
+2018-11-01 11:05:59.989913,Sending Payload 1.
+2018-11-01 11:06:04.012459,Saving RS Payload 1.
+2018-11-01 11:06:04.017461,Sending Payload 2.
+2018-11-01 11:06:07.866912,Saving RS Payload 2.
+2018-11-01 11:06:07.866912,-> {'repeat': '0', 'origin': 'LON', 'destination': 'SYD', 'dep_date': '2018-11-04', 'ret_date': '2018-11-11'}
+2018-11-01 11:06:07.866912,Sending Payload 1.
+2018-11-01 11:06:11.593278,Saving RS Payload 1.
+2018-11-01 11:06:11.603282,Sending Payload 2.
+2018-11-01 11:06:15.435689,Saving RS Payload 2.
+2018-11-01 11:06:15.435689,-> {'repeat': '0', 'origin': 'LON', 'destination': 'SYD', 'dep_date': '2018-11-04', 'ret_date': '2018-11-19'}
+2018-11-01 11:06:15.435689,Sending Payload 1.
+2018-11-01 11:06:18.984003,Saving RS Payload 1.
+2018-11-01 11:06:18.984003,Sending Payload 2.
+2018-11-01 11:06:22.602348,Saving RS Payload 2.
+2018-11-01 11:06:22.604349,-> {'repeat': '0', 'origin': 'LON', 'destination': 'SYD', 'dep_date': '2018-11-05', 'ret_date': '2018-11-12'}
+2018-11-01 11:06:22.606350,Sending Payload 1.

@@ -1,0 +1,51 @@
+<ItineraryBatch ShopDateTimeStart="2018-09-09T07:00:00.000-05:00" ShopDateTimeEnd="2018-09-09T08:00:00.000-05:00">
+	<AirItinerary ShopCount="1" ShopTime="2018-09-09T07:07:33.052-05:00">
+		<RequestInfo POSCountry="MY">
+			<Passenger Code="ADT" Number="1"/>
+			<Segment Origin="KUL" Destination="IST" DepartureDateTime="2018-09-09T23:15:00.000+08:00" Cabin="Y"/>
+			<Segment Origin="IST" Destination="KUL" DepartureDateTime="2018-09-13T01:20:00.000+03:00" Cabin="Y"/>
+		</RequestInfo>
+		<ItineraryLeg>
+			<FlightSegment Origin="KUL" Destination="IST" CarrierCode="TK" FlightNumber="61" DepartureDateTime="2018-09-09T23:15:00.000+08:00" ArrivalDateTime="2018-09-10T05:15:00.000+03:00" Stops="0" BookingCode="L" CabinClass="Y" SeatsRemaining="9" MarriedFlight="false"/>
+		</ItineraryLeg>
+		<ItineraryLeg>
+			<FlightSegment Origin="IST" Destination="KUL" CarrierCode="TK" FlightNumber="60" DepartureDateTime="2018-09-13T01:20:00.000+03:00" ArrivalDateTime="2018-09-13T16:55:00.000+08:00" Stops="0" BookingCode="L" CabinClass="Y" SeatsRemaining="9" MarriedFlight="false"/>
+		</ItineraryLeg>
+		<Fare PassengerCode="ADT" PassengerNumber="1" BaseAmount="1993.00" TaxAmount="1191.00" Currency="MYR" Private="false" Refundable="false" ETicketable="true">
+			<FareSegment Start="KUL" End="IST" FareBasisCode="LY2XP"/>
+			<FareSegment Start="IST" End="KUL" FareBasisCode="LY2XP"/>
+			<Tax Amount="1" Code="H8" Currency="MYR"/>
+			<Tax Amount="63" Code="TR" Currency="MYR"/>
+			<Tax Amount="73" Code="MY" Currency="MYR"/>
+			<Tax Amount="1054" Code="YRF" Currency="MYR"/>
+		</Fare>
+	</AirItinerary>
+	<AirItinerary ShopCount="1" ShopTime="2018-09-09T07:07:55.871-05:00">
+		<RequestInfo POSCountry="MY">
+			<Passenger Code="ADT" Number="1"/>
+			<Segment Origin="KUL" Destination="PAR" DepartureDateTime="2018-09-10T19:30:00.000+08:00" Cabin="Y"/>
+			<Segment Origin="PAR" Destination="KUL" DepartureDateTime="2018-09-11T13:25:00.000+02:00" Cabin="Y"/>
+		</RequestInfo>
+		<ItineraryLeg>
+			<FlightSegment Origin="KUL" Destination="JED" CarrierCode="SV" FlightNumber="835" DepartureDateTime="2018-09-10T19:30:00.000+08:00" ArrivalDateTime="2018-09-10T23:30:00.000+03:00" Stops="0" BookingCode="V" CabinClass="Y" SeatsRemaining="4" MarriedFlight="true"/>
+			<FlightSegment Origin="JED" Destination="CDG" CarrierCode="SV" FlightNumber="127" DepartureDateTime="2018-09-11T03:20:00.000+03:00" ArrivalDateTime="2018-09-11T08:30:00.000+02:00" Stops="0" BookingCode="V" CabinClass="Y" SeatsRemaining="4" MarriedFlight="false"/>
+		</ItineraryLeg>
+		<ItineraryLeg>
+			<FlightSegment Origin="CDG" Destination="JED" CarrierCode="SV" FlightNumber="126" DepartureDateTime="2018-09-11T13:25:00.000+02:00" ArrivalDateTime="2018-09-11T19:50:00.000+03:00" Stops="0" BookingCode="V" CabinClass="Y" SeatsRemaining="4" MarriedFlight="true"/>
+			<FlightSegment Origin="JED" Destination="KUL" CarrierCode="SV" FlightNumber="832" DepartureDateTime="2018-09-11T23:10:00.000+03:00" ArrivalDateTime="2018-09-12T13:00:00.000+08:00" Stops="0" BookingCode="V" CabinClass="Y" SeatsRemaining="4" MarriedFlight="false"/>
+		</ItineraryLeg>
+		<Fare PassengerCode="ADT" PassengerNumber="1" BaseAmount="1361.00" TaxAmount="564.00" Currency="MYR" Private="false" Refundable="true" ETicketable="true">
+			<FareSegment Start="KUL" End="JED" FareBasisCode="VPRT"/>
+			<FareSegment Start="JED" End="CDG" FareBasisCode="VPRT"/>
+			<FareSegment Start="CDG" End="JED" FareBasisCode="VPRT"/>
+			<FareSegment Start="JED" End="KUL" FareBasisCode="VPRT"/>
+			<Tax Amount="100" Code="FR" Currency="MYR"/>
+			<Tax Amount="1" Code="H8" Currency="MYR"/>
+			<Tax Amount="22" Code="IZ" Currency="MYR"/>
+			<Tax Amount="73" Code="MY" Currency="MYR"/>
+			<Tax Amount="138" Code="QX" Currency="MYR"/>
+			<Tax Amount="36" Code="E3" Currency="MYR"/>
+			<Tax Amount="194" Code="IO2" Currency="MYR"/>
+		</Fare>
+	</AirItinerary>
+	</ItineraryBatch>

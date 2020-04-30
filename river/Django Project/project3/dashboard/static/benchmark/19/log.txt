@@ -1,0 +1,21 @@
+2018-11-01 10:38:34.858768,Folder Scaffold dONE: dashboard/static/benchmark/19
+2018-11-01 10:38:34.858768,Write on Templates
+2018-11-01 10:38:34.860768,->OK.
+2018-11-01 10:38:34.861769,Setting Configuration File.
+2018-11-01 10:38:34.862769,-> {'repeat': '0', 'origin': 'MVD', 'destination': 'BUE', 'dep_date': '2018-11-08', 'ret_date': '2018-11-15'}
+2018-11-01 10:38:34.863770,Writting Payload 1.
+2018-11-01 10:38:34.866771,Sending Payload 1.
+2018-11-01 10:38:38.791340,Saving RS Payload 1.
+2018-11-01 10:38:38.794341,Writting Payload 2.
+2018-11-01 10:38:38.796342,Sending Payload 2.
+2018-11-01 10:38:40.459007,Saving RS Payload 2.
+2018-11-01 10:38:40.462008,Creating Individual Dataframes
+2018-11-01 10:38:40.501024,->OK.
+2018-11-01 10:38:40.555045,->OK.
+2018-11-01 10:38:40.557046,Process Summary
+2018-11-01 10:38:40.564049,Opening Configuration File.
+2018-11-01 10:38:40.565049,Processing: 0_MVD_BUE_2018-11-08_2018-11-15
+
+2018-11-01 10:38:40.592060,Dataframes opened correctly.
+2018-11-01 10:38:40.604065,Processed correctly.
+2018-11-01 10:38:40.610067,Summary File Generated.

@@ -1,0 +1,25 @@
+2018-10-23 15:11:45.312461, I will need to generate 350 files.
+2018-10-23 15:11:45.339469, I will need to generate 350 files.
+2018-10-23 15:11:45.566537, 0 files created. 
+2018-10-23 15:11:45.568538, Start of Advanced Processing
+2018-10-23 15:11:45.885633, End  of Advanced Processing
+2018-10-23 15:12:19.610747, I will need to generate 350 files.
+2018-10-23 15:12:19.652760, I will need to generate 350 files.
+2018-10-23 15:12:19.867825, 0 files created. 
+2018-10-23 15:12:19.868825, Start of Advanced Processing
+2018-10-23 15:12:20.237936, End  of Advanced Processing
+2018-10-23 15:12:30.494011, I will need to generate 350 files.
+2018-10-23 15:12:30.507015, I will need to generate 350 files.
+2018-10-23 15:12:30.755090, 0 files created. 
+2018-10-23 15:12:30.756090, Start of Advanced Processing
+2018-10-23 15:12:31.199223, End  of Advanced Processing
+2018-10-23 15:15:07.114984, I will need to generate 350 files.
+2018-10-23 15:15:07.130988, I will need to generate 350 files.
+2018-10-23 15:15:07.487095, 0 files created. 
+2018-10-23 15:15:07.490096, Start of Advanced Processing
+2018-10-23 15:15:08.143292, End  of Advanced Processing
+2018-10-23 15:15:48.234316, I will need to generate 350 files.
+2018-10-23 15:15:48.251321, I will need to generate 350 files.
+2018-10-23 15:15:48.511399, 0 files created. 
+2018-10-23 15:15:48.514400, Start of Advanced Processing
+2018-10-23 15:15:48.881510, End  of Advanced Processing
