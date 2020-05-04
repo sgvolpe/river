@@ -9,11 +9,13 @@ from django.http import HttpResponse
 from django.shortcuts import render
 
 def index(request):
-    return HttpResponse('TESTTT')
+    return render(request, 'dashboard/analysisapp_list.html', context={})
+
 
 
 class AnalysisAppDetailView(DetailView):
     model = AnalysisApp
+
 
     def get_context_data(self, **kwargs):
         self.object.run()

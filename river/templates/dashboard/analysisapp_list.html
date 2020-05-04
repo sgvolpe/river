@@ -1,10 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>analysisapp_list</title>
-</head>
-<body>
 
-</body>
-</html>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    <title>List of Dashboards</title>
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h1>Dashboards</h1>
+            <button>Create New Dashboard</button>
+            <hr>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <ul>
+                {% for obj in object_list %}
+                    <li><a href="{% url 'dashboard:app-detail' pk=obj.pk%}">{{obj.title}}</a>  </li>
+                {% empty %}
+                    <li>No articles yet.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

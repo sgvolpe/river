@@ -22,7 +22,11 @@ def get_app(app_name):
         'stock_app': get_stock_app(),
         'simple_example': get_simple_example(),
         'linear_regression': get_linear_regression(),
+        'live_app': get_live_app(),
+
         'analysis_app': AnalysisApp().get_app(),
+
+
     }[app_name]
 
 
@@ -267,7 +271,7 @@ def get_live_app():
             dcc.Graph(id='live-update-graph', style={'width': 1200}),
             dcc.Interval(
                 id='interval-component',
-                interval=600000,
+                interval=10000,
                 n_intervals=0
             )])
     ])
