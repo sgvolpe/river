@@ -22,6 +22,11 @@ def login(request):
     return render(request, 'login.html', context={'test': 'test'})
 
 
+def cameras(request):
+    print ('Cameras???')
+    return render(request, 'cameras.html', context={'test': 'test'})
+
+
 def register(request):
 
     registered = False

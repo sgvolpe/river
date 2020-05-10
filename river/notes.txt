@@ -11,3 +11,14 @@ import faker
 
 pip freeze > requirements.txt
 pip install -r requirements.txt --no-index --find-links file:///tmp/packages
+
+
+def f(X, L, key):
+    return L[{x:X.index(x) for x in X}[key]]
+
+X = 'id state amount'.split()
+lambda X, key: f(X,key)
+
+
+L = ['0 1 2'.split() for x in range(10)]
+[f(X, l, 'state') for l in L ]

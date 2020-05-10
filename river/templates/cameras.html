@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <title>Cameras</title>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <h1>Random Cameras</h1>
+
+        </div>
+        <div id='cameras' class="row">
+
+
+        </div>
+        <div class="row"></div>
+        <div class="row"></div>
+
+    </div>
+    <script >
+        console.log('Getting Cameras') ;
+
+        var settings = {
+            "async": true,
+            "crossDomain": true,
+            //"url": "https://webcamstravel.p.rapidapi.com/webcams/list/orderby=random?category=live&lang=en&show=webcams:player,url,category,image,location,video,history",
+            "url": "https://webcamstravel.p.rapidapi.com/webcams/list/property=live,hd/orderby=random?&show=webcams:player,url,category,image,location,video,history",//country=UK/
+            //"url": "https://webcamstravel.p.rapidapi.com/api/webcams/v2/list?property=live",
+            //"url": "https://webcamstravel.p.rapidapi.com/webcams/list/property=live",
+            //"url": "https://webcamstravel.p.rapidapi.com/webcams/list/webcam=1459257539?lang=en&show=webcams%3Aimage%252Clocation",
+            "method": "GET",
+            "headers": {
+                "x-rapidapi-host": "webcamstravel.p.rapidapi.com",
+                "x-rapidapi-key": "f82e97ff74mshb849f6b55f76dc4p1d7362jsn62ac4db7acad"
+            }
+        }
+
+
+        cont = $('#cameras')
+
+
+
+        function add_cam(container, cam){
+                id = cam.id ;
+                title = cam.title ;
+                val = id.substring(8,10) ;
+
+
+
+                card = '<div class="col-6"><div class="card" style="height: 425px">'
+                card = card + '<div class="card-body" >'
+                card = card + '<h5 class="card-title">'+title+'</h5>'
+                if (cam.player.available = 'true'){
+                card = card + '<iframe src="http://webcams.windy.com/webcams/stream/' + id + '" frameborder="0" style="width: 100%; height: 100%"></iframe>'
+
+
+                }else{
+                    img_src = 'https://images-webcams.windy.com/'+val+'/'+id+'/current/preview/'+id+'.jpg' ;
+                    card = card + '<img class="card-img-top" src='+img_src+' alt="Card image cap">'
+                } ;
+
+
+                //card = card + '<img class="card-img-top" src="http://79.141.89.38/axis-cgi/mjpg/video.cgi?resolution=640x480" alt="Card image cap">'
+
+
+                    card = card + '<p class="card-text"></p>'
+                    //card = card + '<a href="#" class="btn btn-primary">Go somewhere</a>'
+                  card = card + '</div>'
+                card = card + '</div></div>'
+                //'<a href="https://images-webcams.windy.com/'+val+'/'+id+'/current/preview/'+id+'.jpg">'+title+'</a>'
+
+                //context = '<a href="https://images-webcams.windy.com/39/1459257539/current/preview/'+id+'.jpg">'+title+'</a>' ;
+                container.html(container.html() + '</br>' + card)
+
+
+            } ;
+
+        $( document ).ready(function() {
+
+
+
+            $.ajax(settings).done(function (response) {
+                console.log(response) ;
+                cams = response.result.webcams ;
+                console.log(cams) ;
+                cont = $('#cameras') ;
+                for (id in cams){
+                    add_cam(cont, cams[id])
+                } ;
+
+
+        });
+
+
+
+        });
+
+        console.log('Done') ;
+      </script>
+
+
+
+
+{% endblock %}

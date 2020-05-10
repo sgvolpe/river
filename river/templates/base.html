@@ -104,6 +104,7 @@
   <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 
   <!-- Core plugin JavaScript-->
+  <!-- Core plugin JavaScript-->
   <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
 
   <!-- Custom scripts for all pages-->
@@ -115,7 +116,33 @@
   <!-- Page level custom scripts -->
   <script src="{% static 'js/demo/chart-area-demo.js' %}"></script>
   <script src="{% static 'js/demo/chart-pie-demo.js' %}"></script>
+  <script>
+
+    function get_weather(){
+      var settings = {
+          "async": true,
+          "crossDomain": true,
+          "url": "https://community-open-weather-map.p.rapidapi.com/weather?id=2172797&q=London,uk&units=metric",
+          "method": "GET",
+          "headers": {
+              "x-rapidapi-host": "community-open-weather-map.p.rapidapi.com",
+              "x-rapidapi-key": "f82e97ff74mshb849f6b55f76dc4p1d7362jsn62ac4db7acad"
+        }
+      }
+
+    $.ajax(settings).done(function (response) {
+      ico = response.weather[0].icon ;
+      temp = response.main.temp ;
+      icon =  "http://openweathermap.org/img/w/" + ico + ".png"
+      $('#weather').html(temp +   'º <img src='+icon+' alt="">') ;
+    });
+  };
+
+</script>
+
+
 
 </body>
+
 {% plotly_footer %}
 </html>
