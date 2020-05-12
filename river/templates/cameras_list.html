@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <title>List of Preview of Cameras</title>
+{% endblock %}
+
+{% block content %}
+    <div class="">
+        <div class="row">
+            <h1>{{country|safe}} {{property|safe}} Preview of  Cameras </h1>
+
+        </div>
+        <div id='cameras' class="row">
+
+
+        </div>
+        <div class="row"></div>
+        <div class="row"></div>
+
+    </div>
+    <script >
+
+        var country = "{{ country }}" ;
+        var property = "{{ property }}" ;
+        var limit = "{{ limit }}" ;
+        var offset = "{{ offset }}" ;
+        url = "https://webcamstravel.p.rapidapi.com/webcams/list/property=live/orderby=popularity/category=landscape/limit="+limit+","+offset ;
+        if (country != ''){ url = url + "country=" + country}
+        if (property != ''){ url = url + "property=" + property} // property=live
+        url = url + "?&show=webcams:player,url,category,image,location,video,history"; //country=UK/ // ,hd
+        console.log('Getting Cameras ' + country) ;
+        console.log(url) ;
+
+        var settings = {
+            "async": true,
+            "crossDomain": true,
+            "url": url,
+            "method": "GET",
+            "headers": {
+                "x-rapidapi-host": "webcamstravel.p.rapidapi.com",
+                "x-rapidapi-key": "f82e97ff74mshb849f6b55f76dc4p1d7362jsn62ac4db7acad"
+            }
+        }
+
+
+        cont = $('#cameras')
+
+        function add_cam(container, cam){
+                id = cam.id ;
+                title = cam.title ;
+                val = id.substring(8,10) ;
+                tags = []
+                categories = cam.category ;
+                for (tag_id in categories){
+                    tags.push(categories[tag_id].id) ;
+                } ;
+
+                img_src = cam['image']['current']['thumbnail'] ;
+                href = '../view_camera?camera_id=' + id
+
+
+                new_cam = '<a href=' + href + '><img src="' + img_src + '" alt=""><a/></br>' ;
+
+                container.html(container.html() + '</br>' + new_cam)
+
+
+            } ;
+
+        $( document ).ready(function() {
+
+
+
+            $.ajax(settings).done(function (response) {
+                console.log(response) ;
+                cams = response.result.webcams ;
+                console.log(cams) ;
+                cont = $('#cameras') ;
+                for (id in cams){
+                    add_cam(cont, cams[id])
+                } ;
+                offset = parseInt(offset) ;
+                limit = parseInt(limit) ;
+                offset = offset + limit
+                offset = String(offset)
+                limit = String(limit)
+                cont.html(cont.html() +'<a href="../cameras_list?country=US&property&limit='+limit+'&offset='+offset+'">Next </a>')
+            });
+
+
+
+        });
+
+        console.log('Done') ;
+
+
+      </script>
+
+
+
+
+{% endblock %}

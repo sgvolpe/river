@@ -3,13 +3,13 @@
 
 {% block title %}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <title>Cameras</title>
+    <title>List of Preview of Cameras</title>
 {% endblock %}
 
 {% block content %}
     <div class="">
         <div class="row">
-            <h1>{{country|safe}} {{property|safe}} Random Cameras </h1>
+            <h1>{{country|safe}} {{property|safe}} Preview of  Cameras </h1>
 
         </div>
         <div id='cameras' class="row">
@@ -24,10 +24,11 @@
 
         var country = "{{ country }}" ;
         var property = "{{ property }}" ;
-        url = "https://webcamstravel.p.rapidapi.com/webcams/list/property=live/orderby=popularity/category=landscape/" ;
-        if (country != ''){ url = url + "country=" + country}
-        if (property != ''){ url = url + "property=" + property} // property=live
-        url = url + "?&show=webcams:player,url,category,image,location,video,history"; //country=UK/ // ,hd
+        var camera_id = "{{ camera_id }}" ;
+        console.log(camera_id)
+        url = "https://webcamstravel.p.rapidapi.com/webcams/list/webcam="+camera_id +"?&show=webcams:player,url,category,image,location,video,history";
+
+
         console.log('Getting Cameras ' + country) ;
         console.log(url) ;
 
@@ -45,8 +46,6 @@
 
         cont = $('#cameras')
 
-
-
         function add_cam(container, cam){
                 id = cam.id ;
                 title = cam.title ;
@@ -57,12 +56,11 @@
                     tags.push(categories[tag_id].id) ;
                 } ;
 
-                card = '<div class="col-6"><div class="card" style="height: 800px">'
+                card = '<div class="col-6"><div class="card" style="height: 800px; width: 1200px">'
                 card = card + '<div class="card-body" >'
                 card = card + '<h5 class="card-title">'+title+'</h5>'
                 if (cam.player.available = 'true'){
-                card = card + '<iframe src="http://webcams.windy.com/webcams/stream/' + id + '" frameborder="0" style="width: 90%; height: 700px"></iframe>'
-
+                card = card + '<iframe src="http://webcams.windy.com/webcams/stream/' + id + '" frameborder="0" style="width: 90%; height: 75%"></iframe>'
 
                 }else{
                     img_src = 'https://images-webcams.windy.com/'+val+'/'+id+'/current/preview/'+id+'.jpg' ;
@@ -86,10 +84,8 @@
 
             } ;
 
+
         $( document ).ready(function() {
-
-
-
             $.ajax(settings).done(function (response) {
                 console.log(response) ;
                 cams = response.result.webcams ;
@@ -98,20 +94,12 @@
                 for (id in cams){
                     add_cam(cont, cams[id])
                 } ;
-
-
         });
-
-
-
         });
 
         console.log('Done') ;
 
-        //"url": "https://webcamstravel.p.rapidapi.com/webcams/list/orderby=random?category=live&lang=en&show=webcams:player,url,category,image,location,video,history",
-            //"url": "https://webcamstravel.p.rapidapi.com/api/webcams/v2/list?property=live",
-            //"url": "https://webcamstravel.p.rapidapi.com/webcams/list/property=live",
-            //"url": "https://webcamstravel.p.rapidapi.com/webcams/list/webcam=1459257539?lang=en&show=webcams%3Aimage%252Clocation",
+
       </script>
 
 

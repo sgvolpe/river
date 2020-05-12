@@ -23,8 +23,25 @@ def login(request):
 
 
 def cameras(request):
-    print ('Cameras???')
-    return render(request, 'cameras.html', context={'test': 'test'})
+    country = request.GET['country']
+    property = request.GET['property']
+    return render(request, 'cameras.html', context={'test': 'test', 'country': country, 'property': property})
+
+
+def cameras_list(request):
+    country = request.GET['country']
+    property_ = request.GET['property']
+    offset = request.GET['offset']
+    limit = request.GET['limit']
+
+    return render(request, 'cameras_list.html', context={'test': 'test', 'country': country, 'property': property_,
+                                                         'offset': offset, 'limit': limit,
+                                                         })
+
+
+def view_camera(request):
+    camera_id = request.GET['camera_id']
+    return render(request, 'view_camera.html', context={'test': 'test', 'camera_id': camera_id})
 
 
 def register(request):

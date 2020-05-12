@@ -26,7 +26,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/', views.login, name='login'),
     path('register/', views.register, name='register'),
-    path('cameras/', views.cameras, name='cameras'),
+    path('cameras_list', views.cameras_list, name='cameras_list'),
+    path('cameras', views.cameras, name='cameras'),
+    path('view_camera', views.view_camera, name='view_camera'),
 
     path('hello_app/', include('hello_app.urls')),
     path('basic_dash/', include('basic_dash.urls')),
