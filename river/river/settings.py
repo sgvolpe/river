@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'hello_app',
     'basic_dash',
     'dash',
+    'short_url',
 
     'django_plotly_dash.apps.DjangoPlotlyDashConfig',
 

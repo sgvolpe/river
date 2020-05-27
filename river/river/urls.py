@@ -31,6 +31,7 @@ urlpatterns = [
     path('view_camera', views.view_camera, name='view_camera'),
 
     path('hello_app/', include('hello_app.urls')),
+    path('short_url/', include('short_url.urls')),
     path('basic_dash/', include('basic_dash.urls')),
     path('dashboard/', include('dashboard.urls')),
     path('django_plotly_dash/', include('django_plotly_dash.urls'),name='the_django_plotly_dash'),
