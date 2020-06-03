@@ -99,7 +99,7 @@ class LinearRegression_:
 
 
 class LogisticRegression_:
-    def __init__(self, f_path=os.path.join('Resources/data/logistic_regression', 'titanic_train.csv')):
+    def __init__(self, f_path=os.path.join('Rtesources/data/logistic_regression', 'titanic_train.csv')):
         self.train = pd.read_csv(f_path)
         sex = pd.get_dummies(self.train['Sex'], drop_first=True)
         embark = pd.get_dummies(self.train['Embarked'], drop_first=True)

@@ -327,128 +327,159 @@ def get_linear_regression_app():
     files = os.listdir(os.path.join(source_folder, models[0]))
     df_cols = pd.read_csv(os.path.join(source_folder, models[0], files[0])).columns
 
-
     app = DjangoDash('linear_regression_app')
     app.css.append_css({'external_url': 'https://codepen.io/amyoshino/pen/jzXypZ.css'})
     external_js = ["https://code.jquery.com/jquery-3.2.1.min.js", "https://codepen.io/bcd/pen/YaXojL.js"]
     for js in external_js: app.scripts.append_script({"external_url": js})
 
-    app.layout = html.Div([
+    app.layout = html.Div(className='container', children=[
         html.H1('Linear Regression'),
-        html.Div([
-            html.H3('Select stock symbols:', style={'paddingRight': '30px'}),
-            # replace dcc.Input with dcc.Options, set options=options
-            dcc.Dropdown(
-                id='model_type_dropdown',
-                options=[{'label': x, 'value': x} for x in models],
-                value=models[0],
-                multi=False
-            ),
-            dcc.Dropdown(
-                id='files_dropdown',
-                options=[{'label': x, 'value': x} for x in files],
-                value=files[0],
-                multi=False
-            ),
-            dcc.Checklist(
-                id='feature_cols_checkbox',
-                options=[{'label': x, 'value': x} for x in df_cols]
-            ),
-            dcc.Checklist(
-                id='target_checkbox',
-                options=[{'label': x, 'value': x} for x in df_cols]
-            )
+        html.Div(className='row', children=[
 
-            # widen the Div to fit multiple inputs
-        ], style={'display': 'inline-block', 'verticalAlign': 'top', 'width': '30%'}),
-        html.Div([
-            html.H3('Select start and end dates:'),
 
-        ], style={'display': 'inline-block'}),
-        html.Div([
+            html.Div(className='col-6 card', children=[
+                html.H4('Select Model:', style={'paddingRight': '30px'}),
+                dcc.Dropdown(
+                    id='model_type_dropdown',
+                    options=[{'label': x, 'value': x} for x in models],
+                    value=models[0],
+                    multi=False
+                ),
+                html.H4('Select File:', style={'paddingRight': '30px'}),
+                dcc.Dropdown(
+                    id='files_dropdown',
+                    options=[{'label': x, 'value': x} for x in files],
+                    value=files[0],
+                    multi=False
+                )
+            ]),
+
+            html.Div(className='col-6 card', children=[
+                html.H4('Select Features:', style={'paddingRight': '30px'}),
+                dcc.Checklist(
+                    id='feature_cols_checkbox',
+                    options=[{'label': x, 'value': x} for x in df_cols]
+                ),
+                html.H4('Select Target:', style={'paddingRight': '30px'}),
+                dcc.Checklist(
+                    id='target_checkbox',
+                    options=[{'label': x, 'value': x} for x in df_cols]
+                ),
+                html.H4('Select Class:', style={'paddingRight': '30px'}),
+                dcc.Checklist(
+                    id='str_checkbox',
+                    options=[{'label': x, 'value': x} for x in df_cols]
+                )
+            ]
+                     ),
+
+        ]),
+
+        html.Div(className='row card', children=[
             html.Button(
                 id='submit-button',
                 n_clicks=0,
                 children='Submit',
                 style={'fontSize': 24, 'marginLeft': '30px'}
             ),
-        ], style={'display': 'inline-block'}),
-        dcc.Graph(
-            id='my_graph',
-            figure={
-                'data': [
-                    {'x': [1, 2], 'y': [3, 1]}
-                ]
-            }
-        ),
-        dcc.Graph(
-            id='my_graph2',
-            figure={
-                'data': [
-                    {'x': [1, 2], 'y': [3, 1]}
-                ]
-            }
-        ),
-        html.Div(className='row', id='coefficient_table', children=[])
+        ], style={'display': 'inline-block'}
+                 ),
+        html.Div(className='row', style={'height': 500},
+                 children=[
+                     html.Div(className='col-12 card', id='head_table', children=['Loading']),
+                     html.Div(className='col-6 card', children=[
+                         dcc.Graph(
+                             id='my_graph',
+                             figure={'data': [{'x': [1, 2], 'y': [3, 1]}]}
+                         )]
+                              ),
+                     html.Div(className='col-6 card', id='coefficient_table', children=['Loading']),
+
+                     html.Div(className='col-12 card', children=[
+                         dcc.Graph(
+                             id='my_graph2',
+                             figure={
+                                 'data': [
+                                     {'x': [1, 2], 'y': [3, 1]}
+                                 ]
+                             }
+                         ),
+                     ]),
+
+                 ]
+                 ),
+
     ])
 
     @app.callback(
-        [Output('files_dropdown', 'options'),Output('files_dropdown', 'value')],
+        [Output('files_dropdown', 'options'), Output('files_dropdown', 'value')],
         [Input('model_type_dropdown', 'value'), ])
     def update_files(model_type):
-        print ('Updating Files')
+        print('Updating Files')
         wd = os.listdir(os.path.join(source_folder, model_type))
-        print (wd)
+        print(wd)
         files = [{'label': x, 'value': x} for x in wd]
         return files, files[0]
 
     @app.callback(
-            [Output('feature_cols_checkbox', 'options'),
-            Output('target_checkbox', 'options'),
-             Output('feature_cols_checkbox', 'value'),
-             Output('target_checkbox', 'value')
-             ],
-            [Input('files_dropdown', 'value'),
-            Input('model_type_dropdown', 'value')]
+        [Output('feature_cols_checkbox', 'options'), Output('target_checkbox', 'options'), Output('str_checkbox', 'options'),
+         Output('feature_cols_checkbox', 'value'), Output('target_checkbox', 'value'), Output('str_checkbox', 'value'),
+         ],
+        [Input('files_dropdown', 'value'),
+         Input('model_type_dropdown', 'value')]
     )
     def update_checkboxes(files, model_type_dropdown):
         df = pd.read_csv(os.path.join(source_folder, model_type_dropdown, files))
-        cols = [{'label': x, 'value': x} for x in list(df.columns)]
-        return cols, cols, cols[0], cols[0]
 
+        columns_str = df.select_dtypes(include='object').columns
+        if len(columns_str) == 0: columns_str = ['None']
+
+        columns_numeric = df.select_dtypes(include=['float64', 'int']).columns
+        columns_numeric = [{'label': x, 'value': x} for x in columns_numeric]
+        columns_str = [{'label': x, 'value': x} for x in df.columns ]
+        return columns_numeric, columns_numeric, columns_str, columns_numeric[0], columns_numeric[0], columns_str[0]
 
     @app.callback(
-        [Output('my_graph', 'figure'), Output('my_graph2', 'figure'), Output('coefficient_table', 'children')],
+        [Output('my_graph', 'figure'), Output('my_graph2', 'figure'), Output('coefficient_table', 'children'), Output('head_table', 'children')],
         [Input('submit-button', 'n_clicks')],
         [State('feature_cols_checkbox', 'value'),
-         State('target_checkbox', 'value'), State('model_type_dropdown', 'value'), State('files_dropdown', 'value')])
-    def update_graph(n_clicks, feature_cols, target_col, model_type,  f_name):
-        print ('Updating')
-        print (feature_cols, target_col, model_type,  f_name)
+         State('target_checkbox', 'value'), State('str_checkbox', 'value'), State('model_type_dropdown', 'value'), State('files_dropdown', 'value')])
+    def update_output(n_clicks, feature_cols, target_col, class_col, model_type, f_name):
+        print('Updating')
+        print(feature_cols, target_col, model_type, f_name)
         model = handyman.LinearRegression_(f_path=os.path.join(source_folder, model_type, f_name),
                                            cols=feature_cols, target=target_col[0])
         model.evaluate()
         model.predict(context='web')
+
+        if class_col is None or class_col == ['None']:
+            class_col = target_col
+
         fig1 = go.Figure(
             data=[go.Scatter(
                 x=model.y_test,
                 y=model.predictions,
                 mode='markers',  # 'lines+markers'
+                marker=dict(color=model.df[model.target],
+                            showscale=False,  # colors encode categorical variables
+                            line_color='white', line_width=0.5)
             )])
 
         fig2 = go.Figure(
             data=[go.Splom(
-                dimensions=[dict(label=c, values=model.df[c]) for c in feature_cols], #model.cols],
+                dimensions=[dict(label=c, values=model.df[c]) for c in feature_cols],  # model.cols],
                 text=model.df[model.target],
                 marker=dict(color=model.df[model.target],
                             showscale=False,  # colors encode categorical variables
                             line_color='white', line_width=0.5)
-                )
+            )
             ]
         )
 
+        head_table = generate_table_simple(model.df.head())
+
         coefficient_table = generate_table_simple(model.coeff_df)
-        return fig1, fig2, coefficient_table
+        return fig1, fig2, coefficient_table, head_table
 
     if __name__ == '__main__':
         app.run_server(debug=True)
