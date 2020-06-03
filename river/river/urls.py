@@ -30,6 +30,11 @@ urlpatterns = [
     path('cameras', views.cameras, name='cameras'),
     path('view_camera', views.view_camera, name='view_camera'),
 
+    path('random_pic/', views.random_pic, name='random_pic'),
+    path('random_cam/', views.random_cam, name='random_cam'),
+    path('weather/', views.weather, name='weather'),
+
+
     path('hello_app/', include('hello_app.urls')),
     path('short_url/', include('short_url.urls')),
     path('basic_dash/', include('basic_dash.urls')),

@@ -1,0 +1,61 @@
+
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    <title>Weather</title>
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="row" id="weather">Loading Weather...</div>
+
+    </div>
+<!--script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>
+    console.log('Hey') ;
+        function get_country(){
+        console.log('Getting Country') ;
+            var settings = {
+                "async": true,
+                "crossDomain": true,
+                "url": "https://ip-geolocation-ipwhois-io.p.rapidapi.com/json/?ip=81.100.141.67",
+                "method": "GET",
+                "headers": {
+                    "x-rapidapi-host": "ip-geolocation-ipwhois-io.p.rapidapi.com",
+                    "x-rapidapi-key": "f82e97ff74mshb849f6b55f76dc4p1d7362jsn62ac4db7acad"
+                }
+            }
+
+            $.ajax(settings).done(function (response) {
+                console.log(response);
+            });
+
+        } ;
+
+        get_country() ;
+
+        function get_weather(){
+          var settings = {
+              "async": true,
+              "crossDomain": true,
+              "url": "https://community-open-weather-map.p.rapidapi.com/weather?id=2172797&q=London,uk&units=metric",
+              "method": "GET",
+              "headers": {
+                  "x-rapidapi-host": "community-open-weather-map.p.rapidapi.com",
+                  "x-rapidapi-key": "f82e97ff74mshb849f6b55f76dc4p1d7362jsn62ac4db7acad"
+            }
+          }
+
+        $.ajax(settings).done(function (response) {
+          ico = response.weather[0].icon ;
+          temp = response.main.temp ;
+          icon =  "http://openweathermap.org/img/w/" + ico + ".png"
+          $('#weather').html(temp +   'º <img src='+icon+' alt="">') ;
+        });
+      };
+      get_weather()
+
+    </script-->
+
+{% endblock %}

@@ -15,6 +15,8 @@ import plotly.io as pio
 import seaborn as sns
 from flask_caching import Cache
 
+import functional.handyman as handyman
+
 
 def get_app(app_name):
     return {
@@ -23,9 +25,9 @@ def get_app(app_name):
         'simple_example': get_simple_example(),
         'linear_regression': get_linear_regression(),
         'live_app': get_live_app(),
+        'linear_regression_app': get_linear_regression_app(),
 
         'analysis_app': AnalysisApp().get_app(),
-
 
     }[app_name]
 
@@ -72,8 +74,8 @@ def generate_table_simple(dataframe, include_index=True, max_rows=100):
 def generate_table2(dataframe, max_rows=350):
     print('Generating table2')
     table_header = [html.Thead
-                    (html.Tr(
-                        [html.Th(col) for col in dataframe.columns]))]  # [html.Th(dataframe.index.name, scope="col")] +
+        (html.Tr(
+        [html.Th(col) for col in dataframe.columns]))]  # [html.Th(dataframe.index.name, scope="col")] +
     rows = [html.Tr(children=[html.Td(dataframe.iloc[i][col]) for col in dataframe.columns]) for i
             in range(min(len(dataframe), max_rows))]  # html.Th(dataframe.index[i], scope="row")] +
     table_body = [html.Tbody(rows)]
@@ -319,9 +321,142 @@ def get_live_app():
     return app
 
 
+def get_linear_regression_app():
+    source_folder = 'Resources/data'
+    models = os.listdir(source_folder)
+    files = os.listdir(os.path.join(source_folder, models[0]))
+    df_cols = pd.read_csv(os.path.join(source_folder, models[0], files[0])).columns
+
+
+    app = DjangoDash('linear_regression_app')
+    app.css.append_css({'external_url': 'https://codepen.io/amyoshino/pen/jzXypZ.css'})
+    external_js = ["https://code.jquery.com/jquery-3.2.1.min.js", "https://codepen.io/bcd/pen/YaXojL.js"]
+    for js in external_js: app.scripts.append_script({"external_url": js})
+
+    app.layout = html.Div([
+        html.H1('Linear Regression'),
+        html.Div([
+            html.H3('Select stock symbols:', style={'paddingRight': '30px'}),
+            # replace dcc.Input with dcc.Options, set options=options
+            dcc.Dropdown(
+                id='model_type_dropdown',
+                options=[{'label': x, 'value': x} for x in models],
+                value=models[0],
+                multi=False
+            ),
+            dcc.Dropdown(
+                id='files_dropdown',
+                options=[{'label': x, 'value': x} for x in files],
+                value=files[0],
+                multi=False
+            ),
+            dcc.Checklist(
+                id='feature_cols_checkbox',
+                options=[{'label': x, 'value': x} for x in df_cols]
+            ),
+            dcc.Checklist(
+                id='target_checkbox',
+                options=[{'label': x, 'value': x} for x in df_cols]
+            )
+
+            # widen the Div to fit multiple inputs
+        ], style={'display': 'inline-block', 'verticalAlign': 'top', 'width': '30%'}),
+        html.Div([
+            html.H3('Select start and end dates:'),
+
+        ], style={'display': 'inline-block'}),
+        html.Div([
+            html.Button(
+                id='submit-button',
+                n_clicks=0,
+                children='Submit',
+                style={'fontSize': 24, 'marginLeft': '30px'}
+            ),
+        ], style={'display': 'inline-block'}),
+        dcc.Graph(
+            id='my_graph',
+            figure={
+                'data': [
+                    {'x': [1, 2], 'y': [3, 1]}
+                ]
+            }
+        ),
+        dcc.Graph(
+            id='my_graph2',
+            figure={
+                'data': [
+                    {'x': [1, 2], 'y': [3, 1]}
+                ]
+            }
+        ),
+        html.Div(className='row', id='coefficient_table', children=[])
+    ])
+
+    @app.callback(
+        [Output('files_dropdown', 'options'),Output('files_dropdown', 'value')],
+        [Input('model_type_dropdown', 'value'), ])
+    def update_files(model_type):
+        print ('Updating Files')
+        wd = os.listdir(os.path.join(source_folder, model_type))
+        print (wd)
+        files = [{'label': x, 'value': x} for x in wd]
+        return files, files[0]
+
+    @app.callback(
+            [Output('feature_cols_checkbox', 'options'),
+            Output('target_checkbox', 'options'),
+             Output('feature_cols_checkbox', 'value'),
+             Output('target_checkbox', 'value')
+             ],
+            [Input('files_dropdown', 'value'),
+            Input('model_type_dropdown', 'value')]
+    )
+    def update_checkboxes(files, model_type_dropdown):
+        df = pd.read_csv(os.path.join(source_folder, model_type_dropdown, files))
+        cols = [{'label': x, 'value': x} for x in list(df.columns)]
+        return cols, cols, cols[0], cols[0]
+
+
+    @app.callback(
+        [Output('my_graph', 'figure'), Output('my_graph2', 'figure'), Output('coefficient_table', 'children')],
+        [Input('submit-button', 'n_clicks')],
+        [State('feature_cols_checkbox', 'value'),
+         State('target_checkbox', 'value'), State('model_type_dropdown', 'value'), State('files_dropdown', 'value')])
+    def update_graph(n_clicks, feature_cols, target_col, model_type,  f_name):
+        print ('Updating')
+        print (feature_cols, target_col, model_type,  f_name)
+        model = handyman.LinearRegression_(f_path=os.path.join(source_folder, model_type, f_name),
+                                           cols=feature_cols, target=target_col[0])
+        model.evaluate()
+        model.predict(context='web')
+        fig1 = go.Figure(
+            data=[go.Scatter(
+                x=model.y_test,
+                y=model.predictions,
+                mode='markers',  # 'lines+markers'
+            )])
+
+        fig2 = go.Figure(
+            data=[go.Splom(
+                dimensions=[dict(label=c, values=model.df[c]) for c in feature_cols], #model.cols],
+                text=model.df[model.target],
+                marker=dict(color=model.df[model.target],
+                            showscale=False,  # colors encode categorical variables
+                            line_color='white', line_width=0.5)
+                )
+            ]
+        )
+
+        coefficient_table = generate_table_simple(model.coeff_df)
+        return fig1, fig2, coefficient_table
+
+    if __name__ == '__main__':
+        app.run_server(debug=True)
+
+    return app
+
+
 def log(log_f_folder='static/analysis_app', log_f_name='stats_log.txt', to_write='# # # # # # start'):
-
-
     log = open(os.path.join(log_f_folder, log_f_name), 'a')
     log.write(to_write + '\n')
     log.close()
@@ -338,6 +473,7 @@ def try_catch(func):
         log(to_write=to_write)
         print(f'{func.__name__}______________________No Error: {run_time}')
         return value
+
     try:
         return wrapper
     except Exception as e:
@@ -345,8 +481,9 @@ def try_catch(func):
 
 
 DEBUG = True
-class AnalysisApp:
 
+
+class AnalysisApp:
 
     def __init__(self, dfs_path=os.path.join('static', 'dfs'), title='Analysis Dashboard', callback_side='backend'):
         """
@@ -380,29 +517,30 @@ class AnalysisApp:
         self.create_input_components()
         self.create_output_components()
         self.update_inputs()
-        #self.update_output()
+        # self.update_output()
 
         # Create App Layout
         self.app.layout = html.Div([
-                html.H2(self.title),
-                self.input_components,
-                self.div_charts,
-                self.div_tables,
-            ], className="principal")
-        #self.app.config.suppress_callback_exceptions = True
+            html.H2(self.title),
+            self.input_components,
+            self.div_charts,
+            self.div_tables,
+        ], className="principal")
+        # self.app.config.suppress_callback_exceptions = True
 
         # Cache
-        #self.cache = Cache(self.app.server, config={
+        # self.cache = Cache(self.app.server, config={
         #    # try 'filesystem' if you don't want to setup redis
         #    'CACHE_TYPE': 'filesystem',
         #    'CACHE_DIR': 'cache-directory'
-        #})
-        #self.cache.memoize(timeout=5)(self.update_output)
+        # })
+        # self.cache.memoize(timeout=5)(self.update_output)
 
         # Associate callbacks
         if self.callback_side == 'backend':
             self.app.callback(inputs=self.main_inputs, output=self.inputs_as_output, )(self.update_inputs)
-            self.app.callback(inputs=self.function_inputs+[Input('correlation_chart', 'selectedData')], output=self.function_outputs, )(self.update_output)
+            self.app.callback(inputs=self.function_inputs + [Input('correlation_chart', 'selectedData')],
+                              output=self.function_outputs, )(self.update_output)
         elif self.callback_side == 'client':
             ip = ','.join(self.parameter_inputs)
 
@@ -414,7 +552,7 @@ class AnalysisApp:
                 """,
                 output=self.inputs_as_output,
                 inputs=self.main_inputs,
-            )#(self.update_inputs)
+            )  # (self.update_inputs)
 
             self.app.clientside_callback(
                 f"""
@@ -424,7 +562,7 @@ class AnalysisApp:
                 """,
                 output=self.function_outputs,
                 inputs=self.function_inputs,
-            )#(self.update_output)
+            )  # (self.update_output)
 
         if DEBUG: print(' -> Layout & Callbacks Ready')
 
@@ -440,7 +578,7 @@ class AnalysisApp:
         self.CHART_FONT = json_conf['style']['chart_font']
         self.opacity = json_conf['style']['opacity']
 
-        if DEBUG: print(' -> Style Ready',self.template)
+        if DEBUG: print(' -> Style Ready', self.template)
 
     @try_catch
     def get_csv(self, df_name='test_df.csv', path='static/dfs/'):
@@ -468,7 +606,7 @@ class AnalysisApp:
                 dcc.Dropdown(
                     options=[{'label': x, 'value': x} for x in v['data']],
                     value=v['data'][0], className=v['className'], id=f'{i}',
-                    persistence=True, persistence_type='local' # local|memory
+                    persistence=True, persistence_type='local'  # local|memory
                 )
             )
         elif v['control_type'] == 'slider':
@@ -483,21 +621,24 @@ class AnalysisApp:
             )
 
     @try_catch
-    def read_input_configuration(self, input_f_path=''): #TODO: read from file
+    def read_input_configuration(self, input_f_path=''):  # TODO: read from file
         # Create the Inputs from Configuration
         self.inputs_conf = {
-            'dataframe': {'property': 'value', 'control_type': 'dropdown', 'data': self.dataframes, 'className': 'col-6',
+            'dataframe': {'property': 'value', 'control_type': 'dropdown', 'data': self.dataframes,
+                          'className': 'col-6',
                           'main_control': True},
-            'categorical': {'property': 'value', 'control_type': 'dropdown', 'data': self.columns_str, 'className': 'col-6',
+            'categorical': {'property': 'value', 'control_type': 'dropdown', 'data': self.columns_str,
+                            'className': 'col-6',
                             'main_control': False},
-            'numerical': {'property': 'value', 'control_type': 'dropdown', 'data': self.columns_numeric, 'className': 'col-6',
+            'numerical': {'property': 'value', 'control_type': 'dropdown', 'data': self.columns_numeric,
+                          'className': 'col-6',
                           'main_control': False},
         }
 
         if DEBUG: print(' -> Input Configuration Ready')
 
     @try_catch
-    def save_input_config(self, input_f_path=''): #TODO:
+    def save_input_config(self, input_f_path=''):  # TODO:
         pass
 
     @try_catch
@@ -516,16 +657,15 @@ class AnalysisApp:
                 self.parameter_inputs.append(i)
                 self.parameter_inputs.append(f'{i}_selected_data')
                 self.function_inputs.append(Input(i, v['property']))
-                #self.function_inputs.append(Input(i, 'selectedData'))
-
+                # self.function_inputs.append(Input(i, 'selectedData'))
 
                 self.inputs_as_output.append(Output(i, 'options'))
                 self.inputs_as_output.append(Output(i, v['property']))
         print()
         print()
         print()
-        print (self.parameter_inputs)
-        print (self.function_inputs)
+        print(self.parameter_inputs)
+        print(self.function_inputs)
         print()
         print()
 
@@ -551,7 +691,7 @@ class AnalysisApp:
         if DEBUG: print(' -> Output Components Ready')
 
     @try_catch
-    def update_inputs(self, dataframe_name='test_df.csv'): #self.parameter_inputs
+    def update_inputs(self, dataframe_name='test_df.csv'):  # self.parameter_inputs
         """ Update the values of the Input Controls """
         self.read_data(dataframe_name=dataframe_name)
         return [{'label': col, 'value': col} for col in self.columns_str], self.columns_str[0], \
@@ -572,12 +712,12 @@ class AnalysisApp:
                       'template': self.template
                       }
         except Exception as e:
-            print( str(e))
+            print(str(e))
             data, layout = [], {}
         return go.Figure(data=data, layout=layout)
 
     @try_catch
-    def get_histogram(self, categorical_column, variable_column, df,x_name='sepal_length', y_name='petal_length'):
+    def get_histogram(self, categorical_column, variable_column, df, x_name='sepal_length', y_name='petal_length'):
         '''try:
 
             names = df[categorical_column].unique()
@@ -602,15 +742,16 @@ class AnalysisApp:
         except: data, layout = [], {}
         return go.Figure(data=data, layout=layout)'''
 
-        return px.histogram(self.df, x=variable_column, y=variable_column, color=categorical_column, marginal="box", # or violin, rug
-                           hover_data=self.df.columns, template=self.template)
+        return px.histogram(self.df, x=variable_column, y=variable_column, color=categorical_column, marginal="box",
+                            # or violin, rug
+                            hover_data=self.df.columns, template=self.template)
 
     @try_catch
     def get_null_map(self, df, columns_numeric):
         layout = {'legend_orientation': 'h', 'title': go.layout.Title(text=f"Null Distribution", ),
                   'template': self.template
                   }
-        return go.Figure(data=go.Heatmap(z=self.df[columns_numeric].isnull().astype(int).to_numpy()),layout=layout)
+        return go.Figure(data=go.Heatmap(z=self.df[columns_numeric].isnull().astype(int).to_numpy()), layout=layout)
 
     @try_catch
     def generate_correlation_chart(self, categorical_column, **kwargs):
@@ -618,14 +759,14 @@ class AnalysisApp:
         index_vals = self.df[categorical_column].astype('category').cat.codes
 
         fig = go.Figure(data=go.Splom(
-            dimensions=[dict(label = c, values = self.df[c]) for c in self.columns_numeric],
-            text = self.df[categorical_column],
+            dimensions=[dict(label=c, values=self.df[c]) for c in self.columns_numeric],
+            text=self.df[categorical_column],
             marker=dict(color=index_vals,
                         showscale=False,  # colors encode categorical variables
                         line_color='white', line_width=0.5)
         ))
 
-        fig.update_layout(title='Correlations',width=600, height=600, template=self.template)
+        fig.update_layout(title='Correlations', width=600, height=600, template=self.template)
         return fig
 
     @try_catch
@@ -651,28 +792,30 @@ class AnalysisApp:
 
         return pd.DataFrame(D)
 
-    @try_catch # categorical_column, variable_column ####
+    @try_catch  # categorical_column, variable_column ####
     def update_output(self, categorical_column, variable_column, selected_data):
         print(selected_data)
 
         if selected_data is not None:
             selected_points = [p['pointNumber'] for p in selected_data['points']]
-            print (selected_points)
-            #print(self.df[self.df.Index.isin(selected_points)])
+            print(selected_points)
+            # print(self.df[self.df.Index.isin(selected_points)])
 
-            self.selected_df =self.df[self.df.index.isin(selected_points)]
-        else: self.selected_df = self.df
+            self.selected_df = self.df[self.df.index.isin(selected_points)]
+        else:
+            self.selected_df = self.df
         outlayers = self.generate_outlayers(categorical_column)
 
-        kwargs = {'categorical_column': categorical_column, 'variable_column': variable_column, 'df':self.selected_df}
+        kwargs = {'categorical_column': categorical_column, 'variable_column': variable_column, 'df': self.selected_df}
 
         output_generators = OrderedDict({
             'chart1': {'function': self.get_boxplot, 'kwargs': kwargs},
             'chart2': {'function': self.get_histogram, 'kwargs': kwargs},
             'correlation_chart': {'function': self.generate_correlation_chart, 'kwargs': kwargs},
-            'get_null_map': {'function': self.get_null_map, 'kwargs': {'df': self.df, 'columns_numeric': self.columns_numeric}},
+            'get_null_map': {'function': self.get_null_map,
+                             'kwargs': {'df': self.df, 'columns_numeric': self.columns_numeric}},
             'table1': {'function': generate_table_simple, 'kwargs': {'dataframe': self.df.describe().round(1)}},
-            'outlayers_table':  {'function': generate_table_simple, 'kwargs': {'dataframe': outlayers}},
+            'outlayers_table': {'function': generate_table_simple, 'kwargs': {'dataframe': outlayers}},
             'full_Table': {'function': generate_table_simple, 'kwargs': {'dataframe': self.df}},
 
         })
@@ -682,7 +825,6 @@ class AnalysisApp:
     @try_catch
     def get_app(self):
         return self.app
-
 
 
 def get_analys_df_app(dfs_path=os.path.join('static', 'dfs')):
@@ -708,6 +850,7 @@ def get_analys_df_app(dfs_path=os.path.join('static', 'dfs')):
                     value=v['data'][0], className=v['className'], id=f'{i}'
                 )
             )
+
     # # # # # # # # # # # #
     # Style Configuration:
     # COLORS = {'Alternate': '#E50000', 'Baseline': '#3399CC', 'Common': '#31B98E'}
@@ -747,7 +890,7 @@ def get_analys_df_app(dfs_path=os.path.join('static', 'dfs')):
 
     function_outputs = []
     div_charts = html.Div(className='row', id='charts_div', children=[])
-    charts = ['chart1', 'chart2', 'correlation_chart','get_null_map']
+    charts = ['chart1', 'chart2', 'correlation_chart', 'get_null_map']
     for chart_name in charts:
         div_charts.children.append(
             html.Div([dcc.Graph(id=chart_name, style={}), ], className="col-6", id=f'{chart_name}_div'),
@@ -761,7 +904,6 @@ def get_analys_df_app(dfs_path=os.path.join('static', 'dfs')):
         div_tables.children.append(html.Div(id=f'{table_name}', className='col-6'))
         function_outputs.append(Output(table_name, 'children'))
 
-
     # Layout
 
     app.layout = html.Div([
@@ -771,19 +913,20 @@ def get_analys_df_app(dfs_path=os.path.join('static', 'dfs')):
         div_tables,
     ], className="principal")
 
-
-
     @app.callback(inputs=main_inputs, output=inputs_as_output, )
     def update_inputs(dataframe):
         """ Update the values of the Input Controls """
         df = get_csv(dataframe)
 
-        try: columns_str = df.select_dtypes(include='object').columns
-        except: columns_str = ['na']
+        try:
+            columns_str = df.select_dtypes(include='object').columns
+        except:
+            columns_str = ['na']
         try:
             columns_numeric = df.select_dtypes(include=['float64', 'int']).columns
-        except: columns_numeric = ['na']
-        print (columns_numeric)
+        except:
+            columns_numeric = ['na']
+        print(columns_numeric)
         return [{'label': col, 'value': col} for col in columns_str], columns_str[0], \
                [{'label': col, 'value': col} for col in columns_numeric], columns_numeric[0]
 
@@ -792,14 +935,15 @@ def get_analys_df_app(dfs_path=os.path.join('static', 'dfs')):
             names = df[categorical_column].unique()
             data = [
                 go.Box(  # marker=dict(color=COLORS[provider],
-                    #opacity=OPACITY,
+                    # opacity=OPACITY,
                     name=name, x=df[df[categorical_column] == name][categorical_column],
                     y=df[df[categorical_column] == name][variable_column]
                 ) for name in names
             ]
-            layout = {'legend_orientation': 'h', 'title': go.layout.Title(text=f"Distribution of {variable_column}", ), 'template': template}
+            layout = {'legend_orientation': 'h', 'title': go.layout.Title(text=f"Distribution of {variable_column}", ),
+                      'template': template}
         except Exception as e:
-            print( str(e))
+            print(str(e))
             data, layout = [], {}
         return go.Figure(data=data, layout=layout)
 
@@ -828,20 +972,20 @@ def get_analys_df_app(dfs_path=os.path.join('static', 'dfs')):
         except: data, layout = [], {}
         return go.Figure(data=data, layout=layout)'''
 
-        return px.histogram(df, x=variable_column, y=variable_column, color=categorical_column, marginal="box", # or violin, rug
-                           hover_data=df.columns)
+        return px.histogram(df, x=variable_column, y=variable_column, color=categorical_column, marginal="box",
+                            # or violin, rug
+                            hover_data=df.columns)
 
     def get_null_map(df, columns_numeric):
 
         # print (df[columns_numeric].isnull().astype(int).to_numpy())
-       # fig = px.imshow(df[columns_numeric].isnull().astype(int).to_numpy(),
+        # fig = px.imshow(df[columns_numeric].isnull().astype(int).to_numpy(),
         #                #labels=dict(x=columns_numeric, y="Time of Day", color="Productivity"),
-         #               #x=columns_numeric,
-          #              #y=['Morning', 'Afternoon', 'Evening']
-           #             )
-        #fig.update_xaxes(side="top")
+        #               #x=columns_numeric,
+        #              #y=['Morning', 'Afternoon', 'Evening']
+        #             )
+        # fig.update_xaxes(side="top")
         return go.Figure(data=go.Heatmap(z=df[columns_numeric].isnull().astype(int).to_numpy()))
-
 
     def generate_correlation_chart(categorical_column, **kwargs):
 
@@ -885,19 +1029,22 @@ def get_analys_df_app(dfs_path=os.path.join('static', 'dfs')):
 
         return pd.DataFrame(D)
 
-    @app.callback(function_outputs,  inputs=function_inputs + [Input('correlation_chart','selectedData')])
-    def update_output(dataframe, categorical_column, variable_column, selectedData): ####
-        print ('updating?????????????????')
-        print (json.dumps(selectedData, indent=2))
+    @app.callback(function_outputs, inputs=function_inputs + [Input('correlation_chart', 'selectedData')])
+    def update_output(dataframe, categorical_column, variable_column, selectedData):  ####
+        print('updating?????????????????')
+        print(json.dumps(selectedData, indent=2))
 
         try:
             df = get_csv(dataframe)
             print('New DF Loadded: ')
             try:
                 columns_str = df.select_dtypes(include='object').columns
-            except: columns_str = []
-            try: columns_numeric = df.select_dtypes(include=['float64', 'int']).columns
-            except: columns_numeric= []
+            except:
+                columns_str = []
+            try:
+                columns_numeric = df.select_dtypes(include=['float64', 'int']).columns
+            except:
+                columns_numeric = []
             outlayers = generate_outlayers(categorical_column)
 
             kwargs = {'categorical_column': categorical_column, 'variable_column': variable_column}
@@ -906,18 +1053,18 @@ def get_analys_df_app(dfs_path=os.path.join('static', 'dfs')):
                 'chart2': {'function': get_chart2, 'kwargs': kwargs},
                 'correlation_chart': {'function': generate_correlation_chart, 'kwargs': kwargs},
                 'get_null_map': {'function': get_null_map, 'kwargs': {'df': df, 'columns_numeric': columns_numeric}},
-                'table1': {'function': generate_table_simple, 'kwargs': {'dataframe':df.describe().round(1)}},
-                'outlayers_table':  {'function': generate_table_simple, 'kwargs': {'dataframe': outlayers}},
+                'table1': {'function': generate_table_simple, 'kwargs': {'dataframe': df.describe().round(1)}},
+                'outlayers_table': {'function': generate_table_simple, 'kwargs': {'dataframe': outlayers}},
                 'full_Table': {'function': generate_table_simple, 'kwargs': {'dataframe': df}},
 
             })
 
-            print (function_outputs)
+            print(function_outputs)
             return [values['function'](**values['kwargs']) for out_name, values in output_generators.items()
                     if out_name in charts + tables]
 
         except Exception as e:
-            print ('ERROR ' * 10)
+            print('ERROR ' * 10)
             return [f'Error: {str(e)}' for i in function_outputs]
 
     if __name__ == '__main__':
@@ -926,8 +1073,6 @@ def get_analys_df_app(dfs_path=os.path.join('static', 'dfs')):
         except Exception as e:
             return f'Error: {str(e)}'
     print('APP LOADED')
-
-
 
     return app
 

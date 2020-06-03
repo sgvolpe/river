@@ -103,3 +103,24 @@ def register(request):
                           {'user_form':user_form,
                            'profile_form':profile_form,
                            'registered':registered})
+
+
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[-1].strip()
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
+def random_pic(request):
+
+    return render(request, 'random_pic.html', context={'test': 'test'})
+
+def random_cam(request):
+    return render(request, 'random_cam.html', context={'test': 'test'})
+
+def weather(request):
+    print (get_client_ip(request))
+    return render(request, 'weather.html', context={'test': 'test'})

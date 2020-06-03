@@ -13,7 +13,7 @@ class InstaBot:
         self.pw = pw
 
         chrome_options = webdriver.ChromeOptions()
-        chrome_options.add_argument("--incognito")
+        #chrome_options.add_argument("--incognito")
         #options.add_argument('headless')
         self.driver = webdriver.Chrome(chrome_options=chrome_options)
         #self.driver = webdriver.Ie() # .Chrome()
@@ -30,6 +30,8 @@ class InstaBot:
         self.driver.find_element_by_xpath("//input[@name=\"password\"]").send_keys(pw)
         self.driver.find_element_by_xpath('//button[@type="submit"]').click()
         sleep(4)
+        self.driver.find_element_by_xpath("//button[contains(text(), 'Not Now')]") .click()
+        sleep(1)
         self.driver.find_element_by_xpath("//button[contains(text(), 'Not Now')]") .click()
 
 
@@ -75,6 +77,8 @@ class InstaBot:
         self.driver.find_element_by_xpath("/html/body/div[4]/div/div[2]/div[3]/a").click()
 
         buttons = self.driver.find_elements_by_xpath('//button[text()="Follow"]')
+        self.driver.get('https://www.instagram.com/explore/people/suggested/')
+
         i = 0
         try:
             sleep(5)
@@ -89,7 +93,9 @@ class InstaBot:
         self.driver.close()
 
 
-for i in range(10):
+
+
+"""for i in range(10):
     my_bot = InstaBot('sgvolpe12020', 'tableta2')
     try:
 
@@ -100,3 +106,8 @@ for i in range(10):
         sleep(60)
 
     finally:my_bot.close()
+
+"""
+
+my_bot = InstaBot('sgvolpe12020', 'tableta2')
+my_bot.get_to_follow()

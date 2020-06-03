@@ -1,4 +1,4 @@
-<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+<ul class="navbar-nav bg-gradient-secondary sidebar sidebar-dark accordion" id="accordionSidebar">
 
       <!-- Sidebar - Brand -->
       <a class="sidebar-brand d-flex align-items-center justify-content-center" href="">
@@ -77,6 +77,14 @@
           <div class="bg-white py-2 collapse-inner rounded">
             <h6 class="collapse-header">Login Screens:</h6>
             <a class="collapse-item" href="{% url 'hello_app:user_login'%}">Login</a>
+            <a class="collapse-item" href="{% url 'random_pic'%}">Random Pic</a>
+            <a class="collapse-item" href="{% url 'random_cam'%}">Random Cam</a>
+            <a class="collapse-item" href="{% url 'weather'%}">Weather</a>
+            <a class="collapse-item" href="{% url 'short_url:index'%}">Short URL</a>
+            <a class="collapse-item" href="{% url 'cameras'%}">Cameras</a>
+            <a class="collapse-item" href="{% url 'cameras_list'%}">Cameras List</a>
+            <a class="collapse-item" href="{% url 'view_camera'%}">View Camera</a>
+            <a class="collapse-item" href="{% url 'dashboard:app-list'%}">Dashboard List</a>
             <!--a class="collapse-item" href="register.html">Register</a-->
             <!--a class="collapse-item" href="forgot-password.html">Forgot Password</a-->
             <div class="collapse-divider"></div>
