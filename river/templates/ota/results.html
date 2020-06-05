@@ -14,21 +14,24 @@
         {% for element in results %}
             {{element}}
         {% endfor%}
-        {{results.fareComponentDescs.0 }}
 
+
+        {% for fare_comp in  results.itineraryGroups %}
+            {{fare_comp}}
+        |
+        {% endfor %}
         {% for fare_comp in  results.fareComponentDescs %}
 
 
-        <div class="col">
-            <h2>{{fare_comp.id}}</h2>
-            <h2>{{fare_comp.fareCurrency}}{{fare_comp.fareAmount}}</h2>
-            <h2>{{fare_comp.governingCarrier}}</h2>
-            <small>{{fare_comp}}</small>
+            <div class="col">
+                <h2>{{fare_comp.id}} - {{fare_comp.fareCurrency}}{{fare_comp.fareAmount}}</h2>
+                <h2>{{fare_comp.governingCarrier}}</h2>
+                <!--small>{{fare_comp}}</small-->
 
 
-        </div>
+            </div>
         {% endfor %}
-        {{results.fareComponentDescs.0  }}
+
 
     </div>
 
