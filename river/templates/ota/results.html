@@ -8,31 +8,69 @@
 
 <div class="container">
     <h1>Results {{ori}} - {{des}} : </h1>
+
     <h3>{{results.statistics.itineraryGroups.itineraryCount }} Results found</h3>
     <div class="row">
+        {% for PLEASEFAILitin_group in results.itineraryGroups %}
+            {% for leg_desc in itin_group.groupDescription.legDescriptions %}
+                <div class="row">
+                    <div class="col">
 
-        {% for element in results %}
-            {{element}}
+                        <h1>{{leg_desc.departureDate}} {{leg_desc.departureLocation}} -> {{leg_desc.arrivalLocation}} | </h1>
+                    </div>
+                </div>
+            {% endfor %}
+            ***
         {% endfor%}
 
 
-        {% for fare_comp in  results.itineraryGroups %}
-            {{fare_comp}}
-        |
+
+
+
+
+            {% for element in results %}
+            {{element}}
+        {% endfor%}
+
+    </div>
+    <div class="row">
+        {{results.legDescs.1 }}
+        {% for itin_group in results.itineraryGroups %}
+            {% for itin in itin_group.itineraries %}
+                <div class="col-4 card" style="color:red">
+                Itin: {{itin.id}} | Legs: {{itin.legs}}
+                {% for price_info in itin.pricingInformation %}
+                        <h4><small>{{ price_info.fare.totalFare.currency }}</small>{{ price_info.fare.totalFare.totalPrice }}</h4>
+                        {% for passengerInfoList in price_info.fare.passengerInfoList %}
+                            {{passengerInfoList.passengerInfo.totalFare}}
+
+                        {% endfor %}
+                {% endfor %}
+                    Legs
+                {% for leg_id in itin.legs %}
+
+                    {% with id=leg_id.ref %}
+                            {% my_tag results.legDescs|get_elem_adjusted:id "schedules" results.scheduleDescs %}
+                    {% endwith %}
+                {% endfor %}
+                </div>
+            {% endfor %}
+
         {% endfor %}
-        {% for fare_comp in  results.fareComponentDescs %}
+
+    </div>
+    <div class="row">
+    {% for fare_comp in  results.fareComponentDescs %}
 
 
-            <div class="col">
-                <h2>{{fare_comp.id}} - {{fare_comp.fareCurrency}}{{fare_comp.fareAmount}}</h2>
-                <h2>{{fare_comp.governingCarrier}}</h2>
-                <!--small>{{fare_comp}}</small-->
+        <div class="col">
+            <h2>{{fare_comp.id}} - {{fare_comp.fareCurrency}}{{fare_comp.fareAmount}}</h2>
+            <h2>{{fare_comp.governingCarrier}}</h2>
+            <!--small>{{fare_comp}}</small-->
 
 
-            </div>
-        {% endfor %}
-
-
+        </div>
+    {% endfor %}
     </div>
 
 </div>
