@@ -1,12 +1,48 @@
 
 body {
-  background-color:#e2e0e0;/*#57817f ;*/
+  //background-color:blue;/*#57817f ;*/
   color: #57817f ;
   background-top: 10px;
   background-repeat: no-repeat;
   background-position: center;
-
   font-family: 'Amiko', sans-serif;
 }
 
+.main{
+ background-image: url('https://i.picsum.photos/id/1018/3914/2935.jpg') ;
+}
+
 .card{margin: auto; width:90%;height:90%;}
+
+
+.parallax {
+    background-image: url("https://picsum.photos/id/42/3456/2304");
+    height: 250px;
+    width: 100% ;
+    text-align: center;
+    color:white;
+    font-family: monospace ;
+    /* Create the parallax scrolling effect */
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
+
+  .sgv_divider {
+    width: 65px;
+    height: 2px;
+    //background: #333;
+    margin: 20px auto;
+    box-shadow: 0 8px 6px -6px black;
+}
+
+
+.sgv-sidebar{
+    background-color:#8e0e0e;
+}
+
+.sgv-topbar{
+    background-color:#8e0e0e;
+}

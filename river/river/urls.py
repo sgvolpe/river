@@ -35,6 +35,8 @@ urlpatterns = [
     path('weather/', views.weather, name='weather'),
 
 
+
+    path('ota/', include('ota.urls')),
     path('hello_app/', include('hello_app.urls')),
     path('short_url/', include('short_url.urls')),
     path('basic_dash/', include('basic_dash.urls')),

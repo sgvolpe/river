@@ -460,10 +460,19 @@ def get_linear_regression_app():
                 x=model.y_test,
                 y=model.predictions,
                 mode='markers',  # 'lines+markers'
-                marker=dict(color=model.df[model.target],
+                marker=dict(color=model.df[class_col],
                             showscale=False,  # colors encode categorical variables
                             line_color='white', line_width=0.5)
-            )])
+            )],
+            layout = {
+                'title': go.layout.Title(text="Predictions vs Test"),
+                'xaxis': go.layout.XAxis(
+                    title=go.layout.xaxis.Title(text='Y Test')),
+                'yaxis': go.layout.YAxis(
+                    title=go.layout.yaxis.Title(text='Predictions')),
+
+            }
+        )
 
         fig2 = go.Figure(
             data=[go.Splom(

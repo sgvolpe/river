@@ -32,7 +32,6 @@ ALLOWED_HOSTS = ['sgvolpe1.eu.pythonanywhere.com','127.0.0.1']
 
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -47,11 +46,16 @@ INSTALLED_APPS = [
     'basic_dash',
     'dash',
     'short_url',
+    #'templatetags',
+    'ota',
+
+
 
     'django_plotly_dash.apps.DjangoPlotlyDashConfig',
 
 
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -145,7 +149,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    STATIC_DIR,
+    STATIC_DIR, os.path.join(STATIC_DIR,'ota')
 ]
 
 MEDIA_ROOT = MEDIA_DIR

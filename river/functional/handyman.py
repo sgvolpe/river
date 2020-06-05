@@ -1,6 +1,6 @@
-#import geoip
+# import geoip
 try:
-    import datetime, functools,gzip, json, os, requests, smtplib, time
+    import datetime, functools, gzip, json, os, requests, smtplib, time
     from functools import lru_cache
     from ipaddress import IPv4Address
     import matplotlib.pyplot as plt
@@ -13,11 +13,8 @@ try:
     from email.mime.multipart import MIMEMultipart
     from email.mime.text import MIMEText
 
-
-
-    #from ipaddress import IPv4Address
-    #from functools import lru_cache
-
+    # from ipaddress import IPv4Address
+    # from functools import lru_cache
 
     from sklearn.model_selection import train_test_split
     from sklearn.linear_model import LinearRegression
@@ -25,14 +22,30 @@ try:
     from sklearn.metrics import classification_report
     from sklearn.preprocessing import StandardScaler
     from sklearn.neighbors import KNeighborsClassifier
-    from sklearn.metrics import classification_report,confusion_matrix
+    from sklearn.metrics import classification_report, confusion_matrix
     from sklearn.tree import DecisionTreeClassifier
     from sklearn.svm import SVC
     from sklearn.model_selection import GridSearchCV
 
-except Exception as e: print (f'Could not load Required Librariy: {e}')
+except Exception as e:
+    print(f'Could not load Required Librariy: {e}')
+
+DATA_ROOT = os.path.join('..', 'Resources', 'data')
 
 
+def unzip(f_path=os.path.join(DATA_ROOT, 'names.zip')):
+    import zipfile
+    zipfile.ZipFile(f_path).extractall('.')
+
+
+def pull_file(url, f_name):
+    import urllib.request as request
+    request.urlretrieve(url=url, filename=f_name)
+
+
+def iterate_file_rows(f_path, function):
+    for line in open(f_path):
+        function(line)
 
 
 def analyze_df(df):
@@ -53,6 +66,7 @@ def analyze_df(df):
     sns.countplot(x='Survived', data=df, palette='RdBu_r')
     plt.show()
 
+
 def jointplot(df, x, y):
     sns.set_palette("GnBu_d")
     sns.set_style('whitegrid')
@@ -65,7 +79,8 @@ def jointplot(df, x, y):
 # Machine Learning
 # Linear Regression
 class LinearRegression_:
-    def __init__(self, f_path=os.path.join('Resources/data/linear_regression', 'USA_housing.csv'), cols=False, target=False, test_size=0.4, random_state=313, debug=True):
+    def __init__(self, f_path=os.path.join('Resources/data/linear_regression', 'USA_housing.csv'), cols=False,
+                 target=False, test_size=0.4, random_state=313, debug=True):
         self.df = pd.read_csv(f_path)
         self.cols = cols
         self.target = target
@@ -73,12 +88,13 @@ class LinearRegression_:
         if self.debug: print('Initializing')
 
         if not self.cols: self.cols = ['Avg. Area Income', 'Avg. Area House Age', 'Avg. Area Number of Rooms',
-                        'Avg. Area Number of Bedrooms', 'Area Population']
+                                       'Avg. Area Number of Bedrooms', 'Area Population']
         if not self.target: self.target = 'Price'
 
         self.X = self.df[self.cols]
         self.y = self.df[self.target]
-        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X, self.y, test_size=test_size, random_state=random_state)
+        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X, self.y, test_size=test_size,
+                                                                                random_state=random_state)
         self.lm = LinearRegression()
         self.lm.fit(self.X_train, self.y_train)
 
@@ -87,7 +103,7 @@ class LinearRegression_:
         self.lm.fit(self.X_train, self.y_train)
         print(self.lm.intercept_)
         self.coeff_df = pd.DataFrame(self.lm.coef_.T, self.X.columns, columns=['Coefficient'])
-        print (self.coeff_df)
+        print(self.coeff_df)
 
     def predict(self, context='desktop'):
         self.predictions = self.lm.predict(self.X_test)
@@ -99,7 +115,7 @@ class LinearRegression_:
 
 
 class LogisticRegression_:
-    def __init__(self, f_path=os.path.join('Rtesources/data/logistic_regression', 'titanic_train.csv')):
+    def __init__(self, f_path=os.path.join('Resources/data/logistic_regression', 'titanic_train.csv')):
         self.train = pd.read_csv(f_path)
         sex = pd.get_dummies(self.train['Sex'], drop_first=True)
         embark = pd.get_dummies(self.train['Embarked'], drop_first=True)
@@ -127,7 +143,7 @@ class LogisticRegression_:
                 return Age
 
         self.train['Age'] = self.train[['Age', 'Pclass']].apply(impute_age, axis=1)
-        print (self.train.info())
+        print(self.train.info())
 
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.train.drop('Survived', axis=1),
                                                                                 self.train['Survived'], test_size=0.30,
@@ -135,7 +151,6 @@ class LogisticRegression_:
 
         self.model = LogisticRegression()
         self.model.fit(self.X_train, self.y_train)
-
 
     def predict(self):
         self.predictions = self.model.predict(self.X_test)
@@ -146,7 +161,8 @@ class LogisticRegression_:
 
 class KNN_:
 
-    def __init__(self, f_path=os.path.join('../ML/data', 'Classified Data'), test_size=0.4, random_state=313, debug=True, n_neighbors=1):
+    def __init__(self, f_path=os.path.join('../ML/data', 'Classified Data'), test_size=0.4, random_state=313,
+                 debug=True, n_neighbors=1):
         self.df = pd.read_csv(f_path, index_col=0)
         self.debug = debug
 
@@ -185,9 +201,11 @@ class KNN_:
         plt.ylabel('Error Rate')
         plt.show()
 
+
 class DecisionTree_:
 
-    def __init__(self, f_path=os.path.join('../ML/data', 'kyphosis.csv'), cols=False, target=False, test_size=0.4, random_state=313, debug=True):
+    def __init__(self, f_path=os.path.join('../ML/data', 'kyphosis.csv'), cols=False, target=False, test_size=0.4,
+                 random_state=313, debug=True):
         self.df = pd.read_csv(f_path)
         self.cols = cols
         self.target = target
@@ -197,7 +215,8 @@ class DecisionTree_:
         self.X = self.df.drop('Kyphosis', axis=1)
         self.y = self.df['Kyphosis']
 
-        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X, self.y, test_size=test_size, random_state=random_state)
+        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X, self.y, test_size=test_size,
+                                                                                random_state=random_state)
         self.model = DecisionTreeClassifier()
         self.model.fit(self.X_train, self.y_train)
 
@@ -215,12 +234,12 @@ class SVM_:
         self.debug = debug
         self.data = load_breast_cancer()
         self.df_feat = pd.DataFrame(self.data['data'], columns=self.data['feature_names'])
-        self.df_target = pd.DataFrame(self.data['target'],columns=['Cancer'])
+        self.df_target = pd.DataFrame(self.data['target'], columns=['Cancer'])
 
         if self.debug: print('Initializing')
 
-
-        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.df_feat, np.ravel(self.df_target), test_size=test_size,
+        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.df_feat, np.ravel(self.df_target),
+                                                                                test_size=test_size,
                                                                                 random_state=random_state)
         self.model = SVC()
         self.model.fit(self.X_train, self.y_train)
@@ -230,13 +249,12 @@ class SVM_:
         print(classification_report(self.y_test, self.predictions))
         print(confusion_matrix(self.y_test, self.predictions))
 
-
     def grid_search(self):
         param_grid = {'C': [0.1, 1, 10, 100, 1000], 'gamma': [1, 0.1, 0.01, 0.001, 0.0001], 'kernel': ['rbf']}
         grid = GridSearchCV(SVC(), param_grid, refit=True, verbose=3)
         grid.fit(self.X_train, self.y_train)
-        print (grid.best_params_)
-        print (grid.best_estimator_)
+        print(grid.best_params_)
+        print(grid.best_estimator_)
         self.grid_predictions = grid.predict(self.X_test)
         print(confusion_matrix(self.y_test, self.grid_predictions))
         print(classification_report(self.y_test, self.grid_predictions))
@@ -244,20 +262,20 @@ class SVM_:
 
 class KMeans:
 
-
-    def __init__(self, f_path=os.path.join('../ML/data', 'kyphosis.csv'), cols=False, target=False, test_size=0.4, random_state=313, debug=True):
+    def __init__(self, f_path=os.path.join('../ML/data', 'kyphosis.csv'), cols=False, target=False, test_size=0.4,
+                 random_state=313, debug=True):
         from sklearn.datasets import make_blobs
         from sklearn.cluster import KMeans
 
         # Create Data
         self.debug = debug
-        self.data = make_blobs(n_samples=200, n_features=2,centers=4, cluster_std=1.8, random_state=101)
+        self.data = make_blobs(n_samples=200, n_features=2, centers=4, cluster_std=1.8, random_state=101)
 
         if self.debug: print('Initializing')
         self.model = KMeans(n_clusters=4)
         self.model.fit(self.data[0])
-        print (self.model.cluster_centers_)
-        print (self.model.labels_)
+        print(self.model.cluster_centers_)
+        print(self.model.labels_)
 
         f, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(10, 6))
         ax1.set_title('K Means')
@@ -265,7 +283,6 @@ class KMeans:
         ax2.set_title("Original")
         ax2.scatter(self.data[0][:, 0], self.data[0][:, 1], c=self.data[1], cmap='rainbow')
         plt.show()
-
 
 
 @lru_cache(1024)
@@ -292,7 +309,9 @@ def country_of(ip):
         return ''
 
     return reply['name']
-#country_of('81.100.141.67')
+
+
+# country_of('81.100.141.67')
 
 
 def log(log_f_folder, log_f_name, to_write):
@@ -309,20 +328,23 @@ def log(log_f_folder, log_f_name, to_write):
 
 def timer(func):
     """Print the runtime of the decorated function"""
+
     @functools.wraps(func)
     def wrapper_timer(*args, **kwargs):
-        start_time = time.perf_counter()    # 1
+        start_time = time.perf_counter()  # 1
         value = func(*args, **kwargs)
-        end_time = time.perf_counter()      # 2
-        run_time = end_time - start_time    # 3
+        end_time = time.perf_counter()  # 2
+        run_time = end_time - start_time  # 3
         print(f"Finished {func.__name__!r} in {run_time:.4f} secs")
         return value
+
     return wrapper_timer
 
+
 def get_credentials(what_for, creds_path=os.path.join('..', 'Resources', 'credentials.txt')):
-    #file_open = open(creds_path)
+    # file_open = open(creds_path)
     with open(creds_path) as json_file:
-        print (json_file)
+        print(json_file)
         json_creds = json.load(json_file, encoding='cp1252')
 
     json_file.close()
@@ -330,8 +352,7 @@ def get_credentials(what_for, creds_path=os.path.join('..', 'Resources', 'creden
 
 
 def send_email(email_from='sgvolpe1@gmail.com', email_to='sgvolpe1@gmail.com', email_subject="HTML Message",
-                email_body="""<html><body><h1>Test Email</h1></body></html>""", attachments=[]):
-
+               email_body="""<html><body><h1>Test Email</h1></body></html>""", attachments=[]):
     # Treat Message
     message = MIMEMultipart()
     message['From'] = email_from
@@ -359,54 +380,8 @@ def send_email(email_from='sgvolpe1@gmail.com', email_to='sgvolpe1@gmail.com', e
     connection.login(username, password)
     connection.sendmail(email_from, email_to, message.as_string())
     connection.quit()
-#send_email( attachments=['../Resources/test.txt'])
-
-def facebook_post():
-    import facebook
-
-    def get_token():
-        return 'EAAHoT7BxOjUBAIRDoYlT9SIZBxiZAYqeXxa5BfjLTEWa1CADPZC5mJyBPKZCN3NSIjFDrtaZAkZBbKV0tByEpFZATYqeQXBcYrZAMyHplRDpZCF4VkaIAnQDeNd48Gs2EzASvMNfzMzfsJvXCmWMHZA2aJsln8f3rZCZBgEkBmZAbMn5FKFY2XxyHojUHyvXw0GUtDbyfa6hcLlN2G5gBdxKCFQQRpzZC4Oucmh479iP4tvt5KZCwZDZD'
-
-    host = 'graph.facebook.com'
-
-    graph = facebook.GraphAPI(access_token=get_token(), version="7.0")
-
-    print(graph.get_object(id='10156973440365966', fields='photos'))
-    print(graph.get_object(id='2304301603151927', fields='photos'))
 
 
-    """graph.put_object(
-        parent_object="me",
-        connection_name="feed",
-        message="This is a great website. Everyone should visit it.",
-    #    link="https://www.facebook.com"
-    )"""
+# send_email( attachments=['../Resources/test.txt'])
 
 
-
-import facebook
-
-def main():
-   # Fill in the values noted in previous steps here
-   cfg = {
-   "page_id"      : "10156973440365966",  # Step 1
-   "access_token" : "EAAHoT7BxOjUBAKTVZAhiL4xqM0reZACyDpLfeCvMdd4dTKA3gMOLHI5zpZCDKN42cRtwOrR3nfKMt9ILuquZBll9hTaprdQMrZBThzlmNqSqCdmaPJJO82t0K1bh7ZBs3ZBaqAFmTGYRZBpUXqNnubUMH6tzhWWCQrbUwxU60xbOpLicYaGFTfvBu1UCSxxbxiJOR5vazYtrYtuYZCOxfYyjqkvOWmc625klipv5selGhIQZDZD"   # Step 3
-    }
-   api = get_api(cfg)
-   msg = "Hello, world!"
-   status = api.put_wall_post(msg)
-
-def get_api(cfg):
-
-    graph = facebook.GraphAPI(access_token=cfg['access_token'], version="2.7")
-    resp = graph.get_object('me/accounts')
-    print (resp)
-    page_access_token = None
-    for page in resp['data']:
-        if page['id'] == cfg['page_id']:
-            page_access_token = page['access_token']
-        graph = facebook.GraphAPI(page_access_token)
-        return graph
-
-if __name__ == "__main__":
-    main()

@@ -1,0 +1,48 @@
+{% extends 'ota/base.html' %}
+{% load static %}
+{% block title %}
+    <title>Shop</title>
+{% endblock %}
+{% block content %}
+{% load extra_tags %}
+
+<div class="container">
+    <h1>Results {{ori}} - {{des}} : </h1>
+    <h3>{{results.statistics.itineraryGroups.itineraryCount }} Results found</h3>
+    <div class="row">
+
+        {% for element in results %}
+            {{element}}
+        {% endfor%}
+        {{results.fareComponentDescs.0 }}
+
+        {% for fare_comp in  results.fareComponentDescs %}
+
+
+        <div class="col">
+            <h2>{{fare_comp.id}}</h2>
+            <h2>{{fare_comp.fareCurrency}}{{fare_comp.fareAmount}}</h2>
+            <h2>{{fare_comp.governingCarrier}}</h2>
+            <small>{{fare_comp}}</small>
+
+
+        </div>
+        {% endfor %}
+        {{results.fareComponentDescs.0  }}
+
+    </div>
+
+</div>
+
+
+
+
+<script>
+
+
+
+
+    console.log('End') ;
+
+</script>
+{% endblock %}
