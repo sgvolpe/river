@@ -1,0 +1,43 @@
+{% load static %}
+
+<div class="container-fluid itinerary_container">
+    <h3 hidden>{{itin_id}}</h3>
+    <div class="row">
+        <div class="col-sm-3">
+            {{itinerary.itinerary_origin}} -- {{itinerary.itinerary_destination}}
+            <h4><small>{{itinerary.currency}}</small>{{itinerary.total_price}}</h4>
+            <h4><small><img src="https://daisycon.io/images/airline/?width=150&height=75&color=ffffff&iata={{itinerary.main_carrier}}" alt="{{itinerary.main_carrier}}"></small></h4>
+            <button type="button" class="btn btn-warning">Select</button>
+        </div>
+        <div style="width: 2px;  background-color:#e2e2e2"></div>
+        <div class="col-sm-6">
+
+            {% for flight in itinerary.flights %}
+                <div class="row">
+                    <div class="col-sm">
+                        <h4><small><img src="https://daisycon.io/images/airline/?width=150&height=75&color=ffffff&iata={{flight.carrier}}" alt="{{flight.carrier}}"></small></h4>
+
+                    </div>
+                    <div class="col-sm">
+                        <h5>{{flight.departure_airport}}</h5>
+                        <h5><small>{{flight.departure_time}}</small></h5>
+                    </div>
+                    <div class="col-sm" style="height:1px; widht:100%; background-color:#e2e2e2; margin-top:18px"></div>
+                    <div class="col-sm">
+                        <h5>{{flight.arrival_airport}}</h5>
+                        <h5><small>{{flight.arrival_time}}</small></h5>
+                    </div>
+                </div>
+            {% endfor %}
+
+        </div>
+        <div class="col-sm-1">
+            col3
+
+        </div>
+    </div>
+    <div class="row" style="height: 2px;  background-color:#e2e2e2"></div>
+    <div class="row" >
+        <div class="col"><h5><span class="badge badge-warning">Best Choice</span></h5></div>
+    </div>
+</div>
