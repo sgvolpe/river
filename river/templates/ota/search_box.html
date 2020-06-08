@@ -9,13 +9,13 @@
                       <label for="input_origin">Origin</label>
                       <input type="text" class="form-control" id="input_origin" name="ori" placeholder="Origin" value="MVD">
                       <label for="input_start_date">Start Date</label>
-                      <input type="date" class="form-control" id="input_start_date" name="sta" placeholder="Password">
+                      <input type="date" class="form-control" id="input_start_date" name="sta" placeholder="Start Date" >
                     </div>
                     <div class="form-group col-md-4">
                       <label for="input_destination">Destination</label>
-                      <input type="text" class="form-control" id="input_destination" name="des" placeholder="Password" value="BUE">
+                      <input type="text" class="form-control" id="input_destination" name="des" placeholder="Destination" value="BUE">
                         <label for="input_start_date">Return Date</label>
-                      <input type="date" class="form-control" id="input_end_date" name="ret" placeholder="Password">
+                      <input type="date" class="form-control" id="input_end_date" name="ret" placeholder="Return Date" >
                     </div>
                     <div class="form-group col-md-4">
 
@@ -34,3 +34,45 @@
         <div class="row"></div>
 
     </div>
+
+<script>
+    Date.prototype.toDateInputValue = (function() {
+        var local = new Date(this);
+        local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
+        return local.toJSON().slice(0,10);
+    });
+
+    Date.prototype.addDays = function(days) {
+        var date = new Date(this.valueOf());
+        date.setDate(date.getDate() + days);
+        return date;
+    }
+
+
+    $("#input_start_date").val(new Date().toDateInputValue());
+    $("#input_end_date").val(new Date().addDays(7).toDateInputValue());
+
+    $("#input_start_date").change(function() {
+        start = new Date($("#input_start_date").val());
+        end = new Date($("#input_end_date").val()) ;
+
+        const diffTime = Math.abs(end - start);
+        los = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if(start > end){
+            $("#input_end_date").val(start.addDays(7).toDateInputValue());
+        } ;
+    });
+
+    $("#input_end_date").change(function() {
+        start = new Date($("#input_start_date").val());
+        end = new Date($("#input_end_date").val()) ;
+
+        const diffTime = Math.abs(end - start);
+        los = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if(start > end){
+            $("#input_start_date").val(end.addDays(-7).toDateInputValue());
+        } ;
+    });
+</script>

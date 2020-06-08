@@ -1,8 +1,35 @@
-<div class="container" style="background-color:white;">
-<div class="row">Airlines</div>
-<div class="row">Prices</div>
-<div class="row">Statistics</div>
-<div class="row">Others</div>
-<div class="row"></div>
+{% load extra_tags %}
 
+
+<div class="container sidenav">
+    <div class="row">
+        <div class="col">
+            <h5>Showing {{offset}} - {{offset|add:limit}} of {{total_options_number}}</h5>
+            <span>
+                {% if offset|subtract:limit >= 0 %}
+                    <a href="{% url 'ota:search' %}?search_id={{search_id}}&offset={{offset|subtract:limit}}">Prev</a>
+                {% endif%}
+                {% if offset|add:limit <= total_options_number|add:limit %}
+                    <a href="{% url 'ota:search' %}?search_id={{search_id}}&offset={{offset|add:limit}}">Next</a>
+                {% endif%}
+            </span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+
+            <h4>Filters</h4>
+            <h5>Airlines</h5>
+            <a href="{% url 'ota:search' %}?search_id={{search_id}}&offset={{offset}}&main_carrier=">Clear Filter</a>
+            <hr>
+
+            {% for name, count in airlines_counter.items %}
+                <span>
+                    <a href="{% url 'ota:search' %}?search_id={{search_id}}&offset={{offset}}&main_carrier={{name}}">{{name}}  ({{count}})</a>
+                </span>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col"><h4><code>{{search_id}}</code></h4></div></div>
 </div>

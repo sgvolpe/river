@@ -35,3 +35,8 @@ def my_tag(a, b, schedules, *args, **kwargs):
              'dep_time': flight['departure']['time'],
              'arr_time': flight['arrival']['time'],
              } for flight in [schedules[sched['ref']-1] for sched in a[b]]]
+
+
+@register.filter(name='subtract')
+def subtract(value, arg):
+    return value - arg

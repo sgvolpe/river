@@ -7,26 +7,22 @@
 {% load extra_tags %}
 
 <div class="container-fluid">
+
     <div class="row">
-        <div class="col">
-            <h1>Results {{ori}} - {{des}} : </h1>
+        <div class="col-2">
+            {% include 'ota/results_side_bar.html' with results=results airlines_counter=airlines_counter search_id=search_id offset=offset limit=limit results=results total_options_number=total_options_number %}
         </div>
-    </div>
-    <div class="row">
-    <div class="col-2">
-        {% include 'ota/results_side_bar.html' with results=results%}
-    </div>
-    <div class="col-8">
-        <div class="row">
-        <div class="col" >
-        {% for itin_id, itinerary in results.items %}
-            {% include 'ota/itinerary_tag.html' with itin_id=itin_id itinerary=itinerary%}
-            <div class="sgv_divider"></div>
-        {% endfor %}
+        <div class="col-8">
+            <div class="row">
+                <div class="col" >
+                {% for itin_id, itinerary in results.items %}
+                    {% include 'ota/itinerary_tag.html' with itin_id=itin_id itinerary=itinerary%}
+                    <div class="sgv_divider"></div>
+                {% endfor %}
+                </div>
+                <div class="sgv_divider"></div>
+            </div>
         </div>
-        <div class="sgv_divider"></div>
-    </div>
-    </div>
     <div class="col-2"></div>
     </div>
 
