@@ -5,6 +5,7 @@
                <form method="GET" action="{% url 'ota:search' %}" id="search-form">
                    {% csrf_token %}
                    <div class="form-row">
+                       <div class="form-group col-md-2"></div>
                       <div class="form-group col-md-4">
                       <label for="input_origin">Origin</label>
                       <input type="text" class="form-control" id="input_origin" name="ori" placeholder="Origin" value="MVD">
@@ -16,14 +17,17 @@
                       <input type="text" class="form-control" id="input_destination" name="des" placeholder="Destination" value="BUE">
                         <label for="input_start_date">Return Date</label>
                       <input type="date" class="form-control" id="input_end_date" name="ret" placeholder="Return Date" >
-                    </div>
-                    <div class="form-group col-md-4">
 
                     </div>
-                      <div class="form-group col-md-4">
-                    </div>
+                    <div class="form-group col-md-2"></div>
+
                   </div>
-                  <button id="submit-btn" type="submit" class="btn btn-dark btn-lg">Search</button>
+                   <div class="row">
+                       <div class="col"></div>
+                       <div class="col">
+                           <button id="submit-btn" type="submit" class="btn btn-dark btn-lg">Search</button>
+                       </div>
+                   </div>
                    <div class="sgv_divider"></div>
                 </form>
            </div>

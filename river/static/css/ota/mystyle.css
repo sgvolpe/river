@@ -20,12 +20,17 @@ navbar{
   overflow-x: hidden;
 }
 
+.search-box input {
+    border-radius: 0;
+}
+
 .search-box{
     background: var(--primary_color);
     color: var(--font_color);
     font-family: unset;
     font-size: 1.5rem;
-    opacity: 0.8;
+    opacity: 0.95;
+
     //background-image: url('../../images/ota/3.jpg');
 
 }

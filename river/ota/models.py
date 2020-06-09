@@ -90,8 +90,7 @@ class Itinerary(models.Model):
         d = model_to_dict(self, fields=[field.name for field in self._meta.fields])
 
         flight_count = len(self.flight_numbers.split(sep))
-        print (self.flight_numbers)
-        print (flight_count)
+
 
         d['flights'] = [{'departure_airport': self.departure_airports.split(sep)[i],
                          'arrival_airport': self.arrival_airports.split(sep)[i],

@@ -11,6 +11,7 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('search', views.search, name='search'),
     path('results', views.results, name='results'),
+    path('see_itinerary/<int:pk>', views.see_itinerary, name='see_itinerary'),
     path('return_something', views.return_something, name='return_something'),
     path('search_details/<int:pk>/', views.search_details.as_view(), name='search_details'),
 

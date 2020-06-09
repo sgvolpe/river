@@ -7,17 +7,18 @@
             <h5>Showing {{offset}} - {{offset|add:limit}} of {{total_options_number}}</h5>
             <span>
                 {% if offset|subtract:limit >= 0 %}
-                    <a href="{% url 'ota:search' %}?search_id={{search_id}}&offset={{offset|subtract:limit}}">Prev</a>
+                    <a href="{% url 'ota:search' %}?search_id={{search_id}}&offset={{offset|subtract:limit}}&ori={{ori}}&des={{des}}">Prev</a>
                 {% endif%}
                 {% if offset|add:limit <= total_options_number|add:limit %}
-                    <a href="{% url 'ota:search' %}?search_id={{search_id}}&offset={{offset|add:limit}}">Next</a>
+                    <a href="{% url 'ota:search' %}?search_id={{search_id}}&offset={{offset|add:limit}}&ori={{ori}}&des={{des}}">Next</a>
                 {% endif%}
             </span>
         </div>
     </div>
     <div class="row">
         <div class="col">
-
+            <h4>Stats</h4>
+            <h4>{{stats}}</h4>
             <h4>Filters</h4>
             <h5>Airlines</h5>
             <a href="{% url 'ota:search' %}?search_id={{search_id}}&offset={{offset}}&main_carrier=">Clear Filter</a>

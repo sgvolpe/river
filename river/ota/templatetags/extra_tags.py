@@ -1,4 +1,4 @@
-import json
+import datetime, json
 from django import template
 
 from django.shortcuts import render
@@ -40,3 +40,7 @@ def my_tag(a, b, schedules, *args, **kwargs):
 @register.filter(name='subtract')
 def subtract(value, arg):
     return value - arg
+
+@register.filter(name='friendly_date')
+def friendly_date(value):
+    return str(datetime.datetime.strftime(datetime.datetime.strptime(value, "%Y-%m-%d"), '%d %b'))

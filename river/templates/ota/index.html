@@ -4,31 +4,36 @@
     <title>Shop</title>
 {% endblock %}
 {% block content %}
-    <div class="container">
+    <div class="container" >
+        <div class="row" id="header" >
+            {% include 'ota/search_box.html' %}
+        </div>
+        <div class="row sgv_divider"></div>
 
-    <div class="row" id="header">
-        {% include 'ota/search_box.html' %}
-    </div>
-    <div class="row sgv_divider"></div>
+        <div class="row">
+            <div class="card"></div>
+            <div class="card"></div>
+            <div class="card"></div>
+        </div>
+        <div class="row sgv_divider"></div>
+        <div class="row">
+            {% include 'ota/carrousel.html' %}
+        </div>
+        <div class="row sgv_divider"></div>
+        <div class="row" style="height:250px">
+            <div class="col">
+                <h4>Promotions</h4>
+                {% for promo in promotions %}
+                    <div class="row">
+                        <a href="{% url 'ota:see_itinerary' pk=promo.pk %}">{{promo.itinerary_origin}}{{promo.itinerary_destination}} from {{promo.currency}}{{promo.total_price}}</a>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="col"><h4>Destinations</h4></div>
+            <div class="col"><h4>Us</h4></div>
 
-    <div class="row">
-        <div class="card"></div>
-        <div class="card"></div>
-        <div class="card"></div>
+        </div>
     </div>
-    <div class="row sgv_divider"></div>
-    <div class="row">
-        {% include 'ota/carrousel.html' %}
-    </div>
-    <div class="row sgv_divider"></div>
-    <div class="row" style="height:250px">
-        <div class="col"><h4>Promotions</h4></div>
-        <div class="col"><h4>Destinations</h4></div>
-        <div class="col"><h4>Us</h4></div>
-
-    </div>
-
-</div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 

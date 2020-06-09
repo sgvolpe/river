@@ -1,4 +1,5 @@
 {% load static %}
+{% load extra_tags %}
 
 <div class="container-fluid itinerary_container">
     <h3 hidden>{{itin_id}}</h3>
@@ -19,12 +20,12 @@
                     </div>
                     <div class="col-sm">
                         <h5>{{flight.departure_airport}}</h5>
-                        <h5><small>{{flight.departure_date}}{{flight.departure_time}}</small></h5>
+                        <h5><small>{{flight.departure_date|friendly_date}} {{flight.departure_time}}</small></h5>
                     </div>
                     <div class="col-sm" style="height:1px; widht:100%; background-color:#e2e2e2; margin-top:18px"></div>
                     <div class="col-sm">
                         <h5>{{flight.arrival_airport}}</h5>
-                        <h5><small>{{flight.arrival_date}}{{flight.arrival_time}}</small></h5>
+                        <h5><small>{{flight.arrival_date|friendly_date}} {{flight.arrival_time}}</small></h5>
                     </div>
                 </div>
             {% endfor %}

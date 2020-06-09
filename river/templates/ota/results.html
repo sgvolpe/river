@@ -1,16 +1,19 @@
 {% extends 'ota/base.html' %}
 {% load static %}
 {% block title %}
-    <title>Shop</title>
+    <title>Shop Results {{ori}} - {{des}}</title>
 {% endblock %}
 {% block content %}
 {% load extra_tags %}
 
 <div class="container-fluid">
 
-    <div class="row">
+    {% if ERROR %}
+        Sorry! {{ERROR}}
+    {% else %}
+            <div class="row">
         <div class="col-2">
-            {% include 'ota/results_side_bar.html' with results=results airlines_counter=airlines_counter search_id=search_id offset=offset limit=limit results=results total_options_number=total_options_number %}
+            {% include 'ota/results_side_bar.html' with results=results airlines_counter=airlines_counter search_id=search_id offset=offset limit=limit results=results total_options_number=total_options_number stats=stats %}
         </div>
         <div class="col-8">
             <div class="row">
@@ -23,12 +26,15 @@
                 <div class="sgv_divider"></div>
             </div>
         </div>
-    <div class="col-2"></div>
+        <div class="col-2"></div>
     </div>
+
+    {% endif %}
+
 
 
     <div class="row">
-
+        We are a Travel Agency
     </div>
 
 </div>
