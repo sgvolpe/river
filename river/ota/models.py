@@ -9,6 +9,9 @@ class Search(models.Model):
     origins = models.CharField(max_length=50, blank=True)
     destinations = models.CharField(max_length=50, blank=True)
     dates = models.CharField(max_length=50, blank=True)
+    adt = models.IntegerField(default=1, blank=True)
+    cnn = models.IntegerField(default=0, blank=True)
+    inf = models.IntegerField(default=0, blank=True)
     options_in_cache = models.IntegerField(blank=True, default=0)
     observations = models.CharField(max_length=250, blank=True)
     created = models.DateTimeField(blank=True, null=True)
@@ -132,6 +135,7 @@ class Reservation(models.Model):
 
 class Passenger(models.Model):
     name = models.CharField(max_length=200)
+    surname = models.CharField(max_length=200)
     phone = models.CharField(max_length=200)
     profile_id = models.CharField(max_length=2, default='0') #TODO
     reservation_id = models.ForeignKey(Reservation, on_delete=models.SET_NULL, null=True)

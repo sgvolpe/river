@@ -1,6 +1,6 @@
 __author__ = 'SGV'
 
-import json
+import datetime, json
 from collections import Counter
 
 from .models import Itinerary, Passenger, Reservation, Search
@@ -11,6 +11,7 @@ from .Api import parse_response, get_token, send_bfm
 from django.db.models import Avg, Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
+from django.utils import timezone
 
 from django.views.generic.detail import DetailView
 
@@ -40,22 +41,25 @@ def clear_cache():
     # #search_from_cache = []
 
 
-def store_new_search(ori, des, sta, ret, options_limit):
-    new_search = Search(origins=ori, destinations=des, dates=','.join([sta, ret]))
-    new_search.save()
+def store_new_search(ori, des, sta, ret, adt=1, cnn=0, inf=0, options_limit=50, search=False):
+    if not search:
+        search = Search(origins=ori, destinations=des, dates=','.join([sta, ret]), adt=int(adt), cnn=int(cnn), inf=int(inf))
+        search.save()
     try:
-        response = send_bfm(ori=ori, des=des, sta=sta, ret=ret, options_limit=int(options_limit))
-        new_search.save_results(results=response)
-        new_search.save()
+        response = send_bfm(ori=ori, des=des, sta=sta, ret=ret, adt=int(adt), cnn=int(cnn), inf=int(inf), options_limit=int(options_limit))
+        search.save_results(results=response)
+        search.save()
     except Exception as e:
         raise Exception(f'{str(e)}')
-    return new_search
+    return search
 
 
 DEBUG = True
 
 
-def search_backend(ori, des, sta, ret, options_limit=50, request_search_id=False, cache=False):
+def search_backend(ori, des, sta, ret, adt, cnn, inf, options_limit=50, request_search_id=False, cache=False):
+    sep = ','
+    print (f'Search backend {ori, des, sta, ret, options_limit, request_search_id, cache}')
     if request_search_id:
         if DEBUG: print(f'Retrieving Existing Search: {request_search_id}')
         search = Search.objects.get(pk=request_search_id)
@@ -64,22 +68,41 @@ def search_backend(ori, des, sta, ret, options_limit=50, request_search_id=False
     elif cache:
         if DEBUG: print(f'Trying to retrieve from Cache')
         # Check if there is any info
-        search = Search.objects.filter(origins=ori, destinations=des, dates=[sta, ret])
-        if len(search) == 0:
+        search = Search.objects.filter(origins=ori, destinations=des, adt=int(adt), cnn=int(cnn), inf=int(inf), dates=sep.join([sta, ret]))
+        print (search)
+
+        if len(search) > 0:
+            if DEBUG: print (f'Found in cache: {len(search)}')
+            id = len(search) - 1
+
+            cache_age = timezone.now() - search[id].updated
+            cache_age_minutes = cache_age.total_seconds() / 60
+
+            if cache_age_minutes > 15:
+                if DEBUG: print(f'Cache too old:{cache_age_minutes} minutes')
+                try:
+                    search = store_new_search(ori, des, sta, ret, adt=adt, cnn=cnn, inf=inf,
+                                              options_limit=options_limit, search=search[id])
+                    search_id = search.pk
+                except Exception as e:
+                    raise Exception(f'{e}')
+            else:
+                if DEBUG: print(f'Found in Cache')
+                search_id = search[id].pk
+                search = search[id]
+
+        else:
             if DEBUG: print(f'Nothing in Cache')
             try:
-                search = store_new_search(ori, des, sta, ret, options_limit)
+                search = store_new_search(ori, des, sta, ret, adt=adt, cnn=cnn, inf=inf,
+                                              options_limit=options_limit)
                 search_id = search.pk
             except Exception as e:
                 raise Exception(f'{e}')
-        else:
-            if DEBUG: print(f'Found in Cache')
-            search_id = search[0].pk
-            search = search[0]
     else:
         if DEBUG: print(f'No Search Id Provided Nor using Cache')
         try:
-            search = store_new_search(ori, des, sta, ret, options_limit)
+            search = store_new_search(ori, des, sta, ret, adt=adt, cnn=cnn, inf=inf, options_limit=options_limit)
             search_id = search.pk
         except Exception as e:
             raise Exception(f'{e}')
@@ -96,20 +119,26 @@ def search(request):
         des = request.GET.get('des', '').upper()
         sta = request.GET.get('sta')
         ret = request.GET.get('ret')
+        adt = int(request.GET.get('adt', 1))
+        cnn = int(request.GET.get('cnn', 0))
+        inf = int(request.GET.get('inf', 0))
+
+
+        cache = request.GET.get('cache', 'off') == 'on'
+        search_id = request.GET.get('search_id', False)
 
         offset = int(request.GET.get('offset', 0))
         limit = int(request.GET.get('limit', 5))
 
-        cache = request.GET.get('cache', False) in ['true', 'True', True, 'TRUE']
         options_limit = int(request.GET.get('options_limit', 50))
         main_carrier = request.GET.get('main_carrier', '').upper()
 
         if DEBUG:
-            print(ori, des, sta, ret, cache, request_search_id, offset, limit)
+            print(ori, des, sta, ret, adt, cache, request_search_id, offset, limit)
             print(request.headers['User-Agent'])
             print(request.GET)
 
-        search, search_id = search_backend(ori, des, sta, ret, options_limit, request_search_id, cache)
+        search, search_id = search_backend(ori, des, sta, ret, adt, cnn, inf, options_limit, request_search_id, cache)
         itineraries = search.pull()
         total_options_number = len(itineraries.keys())
 
@@ -259,15 +288,30 @@ def reservation_details(request, pk):
 
 
 def create_reservation(request):
-    name1 = request.POST.get('name1', 'NONE')
-    phone1 = request.POST.get('phone1', 'NONE')
+    name1 = request.POST.get('name1', None)
+    surname1 = request.POST.get('surname1', None)
+    phone1 = request.POST.get('phone1', None)
+    name2 = request.POST.get('name2', None)
+    surname2 = request.POST.get('surname2', None)
+    phone2 = request.POST.get('phone2', None)
+    name3 = request.POST.get('name3', None)
+    surname3 = request.POST.get('surname3', None)
+    phone3 = request.POST.get('phone3', None)
+
     itinerary_id = request.POST.get('itinerary_id', None)
     print (itinerary_id)
 
     passengers = []
-    passenger = Passenger(name=name1, phone=phone1)
-    passenger.save()
-    passengers.append(passenger)
+    paxs = [
+        {'name': name1, 'surname':surname1, 'phone': phone1},
+        {'name': name2, 'surname':surname2, 'phone': phone2},
+        {'name': name3, 'surname':surname3, 'phone': phone3},
+    ]
+    for pax in paxs:
+        if pax['name'] is not None:
+            passenger = Passenger(name=pax['name'], surname=pax['surname'], phone=pax['phone'])
+            passenger.save()
+            passengers.append(passenger)
 
     itinerary = Itinerary.objects.get(pk=int(itinerary_id))
     reservation = Reservation(itinerary_id=itinerary)
