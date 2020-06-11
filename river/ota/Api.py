@@ -10,7 +10,7 @@ def bfm_log(**kwargs):
     bfm_log.write(sep.join([str(v) for v in kwargs.values()]) + '\n')
     bfm_log.close()
 
-
+DEBUG=True
 @function_log
 def parse_response(http_response):
     # TODO: check if http is 200
@@ -28,6 +28,7 @@ def parse_response(http_response):
         raise Exception('No Options Found')
 
     for itin_group in response['itineraryGroups']:
+        if DEBUG: print ('itin_group')
         departure_dates = []
         arrival_dates = []
         for leg_desc in itin_group['groupDescription']['legDescriptions']:
@@ -35,12 +36,35 @@ def parse_response(http_response):
             arrival_dates.append('PENDING***')
 
         for itin in itin_group['itineraries']:
+            if DEBUG: print('itin')
             itinerary = {'legs': itin['legs']}
             itineraries[itin['id'] - 1] = itinerary  # to start in 0
 
+            pricing_info = []
             for price_info in itin['pricingInformation']:
                 itinerary['currency'] = price_info['fare']['totalFare']['currency']
                 itinerary['total_price'] = price_info['fare']['totalFare']['totalPrice']
+
+                for passenger_fare in price_info['fare']['passengerInfoList']:
+                    ptc = passenger_fare['passengerInfo']['passengerType']
+                    pax_count = passenger_fare['passengerInfo']['passengerNumber']
+                    non_ref = passenger_fare['passengerInfo']['nonRefundable']
+                    try:
+                        for fare_component in passenger_fare['passengerInfo']['fareComponents']:
+                            segs = fare_component['segments']
+
+                            rbds = [seg['segment']['bookingCode'] for seg in segs]
+                            cabins = [seg['segment']['cabinCode'] for seg in segs]
+                            meals = [seg['segment']['mealCode'] if 'meals' in seg['segment'] else 'no' for seg in segs]
+
+
+                    except Exception as e:
+                        print (segs)
+
+                        print (f'error: {str(e)}')
+
+                    pricing_info.append({'ptc': ptc, 'pax_count': pax_count, 'non_ref': non_ref,
+                                         'segs':segs, 'rbds': rbds, 'cabins': cabins, 'meals': meals})
 
             flights = []
             flight_count = []
