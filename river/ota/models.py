@@ -14,6 +14,7 @@ class Search(models.Model):
     created = models.DateTimeField(blank=True, null=True)
     updated = models.DateTimeField(blank=True, null=True)
     hits = models.IntegerField(blank=True, null=True, default=0)
+    cheapest_price = models.FloatField(default=999999)
 
     def save_results(self, results) -> None:
         self.save()
@@ -21,6 +22,10 @@ class Search(models.Model):
             itin = Itinerary(search_id=self)
             itin.create_(itinerary_details)
             itin.save()
+
+        itineraries = Itinerary.objects.filter(search_id=self.pk)
+        prices = [itin.total_price for itin in itineraries]
+        self.cheapest_price = min(prices)
         if self.created is None:
             self.created = datetime.datetime.now()
         self.updated = datetime.datetime.now()
@@ -104,3 +109,33 @@ class Itinerary(models.Model):
                         ]
 
         return d
+
+
+class Reservation(models.Model):
+    itinerary_id = models.ForeignKey(Itinerary, on_delete=models.SET_NULL, null=True)
+
+    def get_passengers(self):
+        Passenger.objects.filter(reservation_id=self.pk)
+
+    def add_passenger(self, passenger):
+        passenger.reservation_id = self
+        passenger.save()
+
+    def get_passengers(self):
+        return Passenger.objects.filter(reservation_id=self)
+
+    def get_absolute_url(self):
+        return f"/ota/reservation_details/{str(self.pk)}"
+
+
+
+
+class Passenger(models.Model):
+    name = models.CharField(max_length=200)
+    phone = models.CharField(max_length=200)
+    profile_id = models.CharField(max_length=2, default='0') #TODO
+    reservation_id = models.ForeignKey(Reservation, on_delete=models.SET_NULL, null=True)
+
+    def add_to_reservation(self, reservation):
+        self.reservation_id = reservation
+        self.save()

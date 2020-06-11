@@ -29,7 +29,16 @@
                     </div>
                 {% endfor %}
             </div>
-            <div class="col"><h4>Destinations</h4></div>
+            <div class="col">
+                <div class="row">
+                    <h4>Most Popular</h4>
+                </div>
+                {% for search in most_popular %}
+                     <div class="row">
+                        {{search.origins}} - {{search.destinations}}
+                    </div>
+                {% endfor%}
+            </div>
             <div class="col"><h4>Us</h4></div>
 
         </div>

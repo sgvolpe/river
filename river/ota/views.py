@@ -3,14 +3,14 @@ __author__ = 'SGV'
 import json
 from collections import Counter
 
-from .models import Itinerary, Search
+from .models import Itinerary, Passenger, Reservation, Search
 
 from . import Handyman
 from .Api import parse_response, get_token, send_bfm
 
 from django.db.models import Avg, Sum
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render, redirect
 
 from django.views.generic.detail import DetailView
 
@@ -26,13 +26,6 @@ def error(request):
 def log_search(func):
     pass
 
-
-def index(request):
-
-    promotions = get_promotions()
-
-    return render(request, 'ota/index.html', context={'promotions': promotions,
-                                                      'test': 'test', 'photos': range(10)})
 
 
 # TODO:
@@ -174,7 +167,7 @@ class search_details(DetailView):
 
 
 def populate_cache():
-    airports = ['MVD', 'BUE', 'SCL']
+    airports = ['MVD', 'BUE']
     for ori in airports:
         for des in airports:
             for sta, ret in Handyman.generate_date_pairs():
@@ -185,11 +178,11 @@ def populate_cache():
                     print(str(e))
 
 
-# populate_cache()
+#populate_cache()
 
 def see_itinerary(request, pk):
-    itinerary = Itinerary.objects.get(pk=pk)
-    return render(request, 'ota/itinerary_details.html', context={'itinerary': itinerary})
+    itinerary = Itinerary.objects.get(pk=pk).get_json()
+    return render(request, 'ota/itinerary_details.html', context={'itinerary': itinerary, 'itin_id': pk, 'ERROR': False})
 
 
 def get_itin_statistics(**kwargs):
@@ -212,24 +205,79 @@ def get_top_onds(top_n=50):
 
 
 def get_promotions():
+    print('*** PROMOTIONS ***')
+    print (get_top_onds())
+    cheap_itinearies = []
     for search in get_top_onds():
-        ori = search['origins'].split(',')[0]
-        des = search['destinations'].split(',')[0]
-        ond_price_queryset = Itinerary.objects.filter(itinerary_origin=ori,
-                                                      itinerary_destination=des).values('itinerary_origin',
-                                                        'itinerary_destination').annotate(Avg('total_price'))
-        try:
-            ond_avg_price = ond_price_queryset[0]['total_price__avg']
+        origins = search['origins']
+        destinations = search['destinations']
+        searches = Search.objects.filter(origins=origins, destinations=destinations).values('origins',
+                                        'destinations', 'cheapest_price').annotate(Avg('cheapest_price'))
+        ond_avg_cheapest = searches[0]['cheapest_price__avg']
 
-            cheap_itinearies = Itinerary.objects.filter(itinerary_origin=ori, itinerary_destination=des,
-                                                        total_price__lte=ond_avg_price * .8)
-            print(ond_price_queryset)
-            print(ond_avg_price)
-            print(cheap_itinearies)
-
-            return cheap_itinearies
-        except:
-            pass
+        for it in Itinerary.objects.filter(itinerary_origin=origins, itinerary_destination=destinations,
+                                           total_price__lte=ond_avg_cheapest * 1.0).order_by('total_price')[:1]:
+            cheap_itinearies.append(it)
 
 
-get_promotions()
+    return cheap_itinearies
+
+
+
+def get_shopping_stats(request):
+    """ Returns a Search Queryset """
+    most_popular = Search.objects.values('origins', 'destinations').annotate(Sum('hits')).order_by('hits__sum')
+    trending_7days = Search.objects.values('origins', 'destinations').annotate(Sum('hits')).order_by('hits__sum')
+    return {'most_popular': most_popular}
+
+
+def index(request):
+
+    promotions = get_promotions()
+    shopping_stats = get_shopping_stats('')
+    most_popular = shopping_stats['most_popular']
+
+    return render(request, 'ota/index.html', context={'promotions': promotions, 'most_popular': most_popular,
+                                                      'test': 'test', 'photos': range(10),
+                                                      })
+
+
+def checkout(request, pk):
+    itinerary = Itinerary.objects.get(pk=pk).get_json()
+    return render(request, 'ota/checkout.html', context={'test': 'test', 'ERROR': False, 'itinerary': itinerary,
+                                                         'passengers': {k: '' for k in range(1, 2, 1)},
+                                                         })
+
+def reservation_details(request, pk):
+    reservation = get_object_or_404(Reservation, pk=pk)
+    itinerary = reservation.itinerary_id
+    passengers = reservation.get_passengers()
+
+    return render(request, 'ota/reservation_details.html', context={'itinerary': itinerary.get_json(),
+                                                                    'checkout': 'No', 'passengers': {k+1: v for k, v in enumerate(passengers)},
+                                                                    })
+
+
+def create_reservation(request):
+    name1 = request.POST.get('name1', 'NONE')
+    phone1 = request.POST.get('phone1', 'NONE')
+    itinerary_id = request.POST.get('itinerary_id', None)
+    print (itinerary_id)
+
+    passengers = []
+    passenger = Passenger(name=name1, phone=phone1)
+    passenger.save()
+    passengers.append(passenger)
+
+    itinerary = Itinerary.objects.get(pk=int(itinerary_id))
+    reservation = Reservation(itinerary_id=itinerary)
+    reservation.save()
+
+    reservation.add_passenger(passenger)
+    reservation.save()
+
+    context = {'itinerary': itinerary, 'passengers': passengers, 'reservation': reservation}
+    return redirect(reservation)
+
+
+    return HttpResponse('ok')

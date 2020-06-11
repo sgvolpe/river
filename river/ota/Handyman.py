@@ -2,6 +2,15 @@ import datetime, functools, os, time
 from datetime import timedelta
 
 
+def translate_iata(iata='EZE', what='airport'):
+    cities = {'EZE': 'BUE', 'AEP': 'BUE'}
+    if what == 'airport':
+        try:
+            return cities[iata]
+        except Exception as e:
+            return iata
+
+
 def parse_date(raw_date):
     date_formats = ["%Y-%m-%d", "%d-%m-%Y", "%m-%d-%Y", "%Y/%m/%d", "%d/%m/%Y", "%m/%d/%Y", "%Y.%m.%d", "%d.%m.%Y",
                     "%m.%d.%Y"]
@@ -17,7 +26,7 @@ def add_days_to_date(raw_date: str, plus_days: int) -> str:
     return datetime.datetime.strftime(parse_date(raw_date) + timedelta(days=plus_days), '%Y-%m-%d')
 
 
-def generate_date_pairs(base_date=datetime.datetime.now().date(), ap_list=[7, 14], los_list=[7, 14]):
+def generate_date_pairs(base_date=datetime.datetime.now().date(), ap_list=[30, 60], los_list=[7, 14]):
     """Returns a list of dates based on base_date and the Advanced Purchase list provided"""
 
     return [[str((add_days_to_date(base_date, int(ap)))), str((add_days_to_date(base_date, int(ap) + int(los))))]

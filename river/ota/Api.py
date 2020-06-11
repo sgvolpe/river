@@ -1,6 +1,7 @@
-
 import json, requests
-from . Handyman import add_days_to_date, function_log
+from .Handyman import add_days_to_date, function_log, translate_iata
+
+
 
 
 def bfm_log(**kwargs):
@@ -17,7 +18,7 @@ def parse_response(http_response):
     # version messages statistics scheduleDescs taxDescs taxSummaryDescs fareComponentDescs validatingCarrierDescs baggageAllowanceDescs legDescs
     try:
         response_json = json.loads(http_response.text)
-        if 'groupedItineraryResponse' not in response_json: raise Exception ('groupedItineraryResponse not in response')
+        if 'groupedItineraryResponse' not in response_json: raise Exception('groupedItineraryResponse not in response')
         response = response_json['groupedItineraryResponse']
     except Exception as e:
         raise Exception(f'Could not parse json: {str(e)}')
@@ -33,7 +34,6 @@ def parse_response(http_response):
             departure_dates.append(leg_desc['departureDate'])
             arrival_dates.append('PENDING***')
 
-
         for itin in itin_group['itineraries']:
             itinerary = {'legs': itin['legs']}
             itineraries[itin['id'] - 1] = itinerary  # to start in 0
@@ -43,9 +43,10 @@ def parse_response(http_response):
                 itinerary['total_price'] = price_info['fare']['totalFare']['totalPrice']
 
             flights = []
+            flight_count = []
             for id, leg_id in enumerate(itin['legs']):
                 schedules = response['legDescs'][leg_id['ref'] - 1]['schedules']
-
+                flight_count.append(len(schedules))
                 for schedule in schedules:
                     flight = response['scheduleDescs'][schedule['ref'] - 1]
                     flight_details = {'departure_airport': flight['departure']['airport'],
@@ -83,12 +84,16 @@ def parse_response(http_response):
                 count_carrier = {v: k for k, v in carrier_count.items()}
                 itinerary['main_carrier'] = count_carrier[max(count_carrier.keys())]
 
-                itinerary['itinerary_origin'] = flights[0]['departure_airport']
-                itinerary['itinerary_destination'] = flights[-1]['departure_airport']
+                itinerary['itinerary_origin'] = translate_iata(flights[0]['departure_airport'])
+
                 itinerary['itinerary_departure_time'] = flights[0]['departure_time'][:5]
                 itinerary['itinerary_arrival_time'] = flights[-1]['arrival_time'][:5]
+                itinerary['flight_count'] = flight_count
+
+                itinerary['itinerary_destination'] = translate_iata(flights[flight_count[0] - 1]['arrival_airport']) # TODO: RT OW only
 
     return itineraries
+
 
 @function_log
 def get_token(url="https://api-crt.cert.havail.sabre.com/v2/auth/token", parameters={}, version='v2'):
@@ -151,7 +156,6 @@ def send_bfm(ori, des, sta, ret, options_limit=10):
     with open('static/ota/rs.txt', 'w') as rs:
         rs.write(response.text)
 
-
     try:
         results = parse_response(response)
         results = {k: v for k, v in results.items() if k < options_limit}
@@ -162,4 +166,3 @@ def send_bfm(ori, des, sta, ret, options_limit=10):
     finally:
         bfm_log(ori=ori, des=des, sta=sta, ret=ret, options_limit=options_limit, status=response.status_code,
                 business_error='')
-
