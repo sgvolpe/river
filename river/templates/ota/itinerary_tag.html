@@ -8,6 +8,7 @@
         <div class="col-sm-3">
             <code>{{itinerary.id}}</code>
             <h4><small>{{itinerary.currency}}</small>{{itinerary.total_price}}</h4>
+            <h4>{{itinerary.bags}} x <i class="fa fa-suitcase" aria-hidden="true"></i></h4>
             <h4><small><img src="https://daisycon.io/images/airline/?width=150&height=75&color=ffffff&iata={{itinerary.main_carrier}}" alt="{{itinerary.main_carrier}}"></small></h4>
             {% if checkout == 'No' %}{% else %}<a href="{% url 'ota:checkout' pk=itinerary.id %}"><button type="button" class="btn btn-warning" >Select</button></a>{% endif %}
 

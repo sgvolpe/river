@@ -41,12 +41,13 @@ def clear_cache():
     # #search_from_cache = []
 
 
-def store_new_search(ori, des, sta, ret, adt=1, cnn=0, inf=0, options_limit=50, search=False):
+def store_new_search(origins, destinations, dates, adt=1, cnn=0, inf=0, options_limit=50, search=False):
     if not search:
-        search = Search(origins=ori, destinations=des, dates=','.join([sta, ret]), adt=int(adt), cnn=int(cnn), inf=int(inf))
-        search.save()
+        search = Search(origins=origins, destinations=destinations, dates=dates, adt=int(adt), cnn=int(cnn), inf=int(inf))
+        #search.save()
     try:
-        response = send_bfm(ori=ori, des=des, sta=sta, ret=ret, adt=int(adt), cnn=int(cnn), inf=int(inf), options_limit=int(options_limit))
+        response = send_bfm(origins=origins, destinations=destinations, dates=dates, adt=int(adt), cnn=int(cnn),
+                            inf=int(inf), options_limit=int(options_limit))
         search.save_results(results=response)
         search.save()
     except Exception as e:
@@ -55,11 +56,9 @@ def store_new_search(ori, des, sta, ret, adt=1, cnn=0, inf=0, options_limit=50, 
 
 
 DEBUG = True
-
-
-def search_backend(ori, des, sta, ret, adt, cnn, inf, options_limit=50, request_search_id=False, cache=False):
+def search_backend(origins, destinations, dates, adt, cnn, inf, options_limit=50, request_search_id=False, cache=False):
     sep = ','
-    print (f'Search backend {ori, des, sta, ret, options_limit, request_search_id, cache}')
+    print (f'Search backend {origins, destinations, dates, options_limit, request_search_id, cache}')
     if request_search_id:
         if DEBUG: print(f'Retrieving Existing Search: {request_search_id}')
         search = Search.objects.get(pk=request_search_id)
@@ -68,7 +67,7 @@ def search_backend(ori, des, sta, ret, adt, cnn, inf, options_limit=50, request_
     elif cache:
         if DEBUG: print(f'Trying to retrieve from Cache')
         # Check if there is any info
-        search = Search.objects.filter(origins=ori, destinations=des, adt=int(adt), cnn=int(cnn), inf=int(inf), dates=sep.join([sta, ret]))
+        search = Search.objects.filter(origins=origins, destinations=destinations, adt=int(adt), cnn=int(cnn), inf=int(inf), dates=dates)
         print (search)
 
         if len(search) > 0:
@@ -81,7 +80,7 @@ def search_backend(ori, des, sta, ret, adt, cnn, inf, options_limit=50, request_
             if cache_age_minutes > 15:
                 if DEBUG: print(f'Cache too old:{cache_age_minutes} minutes')
                 try:
-                    search = store_new_search(ori, des, sta, ret, adt=adt, cnn=cnn, inf=inf,
+                    search = store_new_search(origins=origins, destinations=destinations, adt=adt, cnn=cnn, inf=inf,
                                               options_limit=options_limit, search=search[id])
                     search_id = search.pk
                 except Exception as e:
@@ -94,7 +93,7 @@ def search_backend(ori, des, sta, ret, adt, cnn, inf, options_limit=50, request_
         else:
             if DEBUG: print(f'Nothing in Cache')
             try:
-                search = store_new_search(ori, des, sta, ret, adt=adt, cnn=cnn, inf=inf,
+                search = store_new_search(origins=origins, destinations=destinations, dates=dates, adt=adt, cnn=cnn, inf=inf,
                                               options_limit=options_limit)
                 search_id = search.pk
             except Exception as e:
@@ -102,7 +101,8 @@ def search_backend(ori, des, sta, ret, adt, cnn, inf, options_limit=50, request_
     else:
         if DEBUG: print(f'No Search Id Provided Nor using Cache')
         try:
-            search = store_new_search(ori, des, sta, ret, adt=adt, cnn=cnn, inf=inf, options_limit=options_limit)
+            search = store_new_search(origins=origins, destinations=destinations, dates=dates, adt=adt, cnn=cnn, inf=inf,
+                                              options_limit=options_limit)
             search_id = search.pk
         except Exception as e:
             raise Exception(f'{e}')
@@ -113,12 +113,19 @@ def search_backend(ori, des, sta, ret, adt, cnn, inf, options_limit=50, request_
 # @gzip_page()
 def search(request):
     try:
+
         request_search_id = request.GET.get('search_id', False)
 
-        ori = request.GET.get('ori', '').upper()
-        des = request.GET.get('des', '').upper()
-        sta = request.GET.get('sta')
-        ret = request.GET.get('ret')
+       # ori = request.GET.get('ori', '').upper()
+        #des = request.GET.get('des', '').upper()
+        # sta = request.GET.get('sta')
+        # ret = request.GET.get('ret')
+
+        origins = request.GET.get('origins', '').upper()
+        destinations = request.GET.get('destinations', '').upper()
+        dates = request.GET.get('dates', '')
+
+
         adt = int(request.GET.get('adt', 1))
         cnn = int(request.GET.get('cnn', 0))
         inf = int(request.GET.get('inf', 0))
@@ -134,11 +141,12 @@ def search(request):
         main_carrier = request.GET.get('main_carrier', '').upper()
 
         if DEBUG:
-            print(ori, des, sta, ret, adt, cache, request_search_id, offset, limit)
+            print ('***** SEARCH ******** ')
+            print(origins, destinations, dates, adt, cache, request_search_id, offset, limit)
             print(request.headers['User-Agent'])
             print(request.GET)
 
-        search, search_id = search_backend(ori, des, sta, ret, adt, cnn, inf, options_limit, request_search_id, cache)
+        search, search_id = search_backend(origins, destinations, dates, adt, cnn, inf, options_limit, request_search_id, cache)#sta, ret,
         itineraries = search.pull()
         total_options_number = len(itineraries.keys())
 
@@ -159,11 +167,11 @@ def search(request):
         # itineraries = {k: v for k, v in itineraries.items() if offset <= int(k) < offset + limit}
         itineraries = {i: v for i, v in enumerate(itineraries.values()) if offset <= int(i) < offset + limit}
 
-        stats = get_itin_statistics(itinerary_origin=ori, itinerary_destination=des)
+        stats = get_itin_statistics(itinerary_origin=origins, itinerary_destination=destinations)
 
 
         return render(request, 'ota/results.html',
-                      context={'ori': ori, 'des': des, 'sta': sta, 'ret': ret, 'results': itineraries,
+                      context={'ori': origins, 'des': destinations, 'dates': dates, 'results': itineraries,
                                'search_id': search_id, 'limit': limit, 'offset': offset,
                                'total_options_number': total_options_number,
                                'airlines_counter': airlines_counter,

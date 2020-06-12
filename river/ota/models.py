@@ -57,6 +57,9 @@ class Itinerary(models.Model):
     departure_dates = models.CharField(max_length=100, blank=True, default='31-MAR-2021')
     arrival_dates = models.CharField(max_length=100, blank=True, default='31-MAR-2021')
     carriers = models.CharField(max_length=2, blank=True, default='YY')
+    rbds = models.CharField(max_length=50, blank=True, default='na')
+    cabins = models.CharField(max_length=50, blank=True, default='na')
+    bags = models.CharField(max_length=50, blank=True, default='na')
 
     itinerary_origin = models.CharField(max_length=3, blank=True)
     itinerary_destination = models.CharField(max_length=3, blank=True)
@@ -79,6 +82,7 @@ class Itinerary(models.Model):
 
         sep = '|'
 
+        self.bags = sep.join([str(b) for b in itinerary['bags']])
         self.flight_numbers = sep.join(f['carrier'] + parse_flight_number(f['flight_number'])
                                          for f in itinerary['flights'])
         self.departure_airports = sep.join([f['departure_airport'] for f in itinerary['flights']])
@@ -90,6 +94,9 @@ class Itinerary(models.Model):
         self.arrival_dates = sep.join([f['arrival_date'] for f in itinerary['flights']])
 
         self.carriers = sep.join([f['carrier'] for f in itinerary['flights']])
+        self.rbds = sep.join([f['rbd'] for f in itinerary['flights']])
+        self.cabins = sep.join([f['cabin'] for f in itinerary['flights']])
+
 
         self.save()
 
@@ -99,6 +106,7 @@ class Itinerary(models.Model):
 
         flight_count = len(self.flight_numbers.split(sep))
 
+        d['bags'] = min([int(bag) for bag in self.bags.split(sep)])
 
         d['flights'] = [{'departure_airport': self.departure_airports.split(sep)[i],
                          'arrival_airport': self.arrival_airports.split(sep)[i],
@@ -106,7 +114,9 @@ class Itinerary(models.Model):
                          'arrival_time': self.arrival_times.split(sep)[i],
                          'departure_date': self.departure_dates.split(sep)[i],
                          'arrival_date': self.arrival_dates.split(sep)[i],
-                         'carrier': self.carriers.split(sep)[i], 'flight_number': self.flight_numbers.split(sep)[i],
+                         'carrier': self.carriers.split(sep)[i],
+                         'flight_number': self.flight_numbers.split(sep)[i],
+
                          }
                         for i in range(flight_count)
                         ]

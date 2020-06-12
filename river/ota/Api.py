@@ -27,6 +27,9 @@ def parse_response(http_response):
     if 'itineraryGroups' not in response:
         raise Exception('No Options Found')
 
+    baggage_allowance_descriptions = response['baggageAllowanceDescs']
+
+
     for itin_group in response['itineraryGroups']:
         if DEBUG: print ('itin_group')
         departure_dates = []
@@ -41,37 +44,59 @@ def parse_response(http_response):
             itineraries[itin['id'] - 1] = itinerary  # to start in 0
 
             pricing_info = []
+
             for price_info in itin['pricingInformation']:
                 itinerary['currency'] = price_info['fare']['totalFare']['currency']
                 itinerary['total_price'] = price_info['fare']['totalFare']['totalPrice']
 
                 for passenger_fare in price_info['fare']['passengerInfoList']:
+                    rbds, cabins = [], []
                     ptc = passenger_fare['passengerInfo']['passengerType']
                     pax_count = passenger_fare['passengerInfo']['passengerNumber']
                     non_ref = passenger_fare['passengerInfo']['nonRefundable']
+                    bag_infos = passenger_fare['passengerInfo']['baggageInformation']
+
+                    baggage_allowance = []
+                    for bag_info in bag_infos:
+                        for _ in bag_info['segments']:
+                            all = baggage_allowance_descriptions[bag_info['allowance']['ref'] - 1]
+                            if 'pieceCount' in all:
+                                baggage_allowance.append(all['pieceCount'])
+                            else:
+                                baggage_allowance.append(1)
+
+
                     try:
                         for fare_component in passenger_fare['passengerInfo']['fareComponents']:
                             segs = fare_component['segments']
 
-                            rbds = [seg['segment']['bookingCode'] for seg in segs]
-                            cabins = [seg['segment']['cabinCode'] for seg in segs]
+                            rbds += [seg['segment']['bookingCode'] for seg in segs]
+                            cabins += [seg['segment']['cabinCode'] for seg in segs]
                             meals = [seg['segment']['mealCode'] if 'meals' in seg['segment'] else 'no' for seg in segs]
 
-
                     except Exception as e:
-                        print (segs)
-
                         print (f'error: {str(e)}')
 
                     pricing_info.append({'ptc': ptc, 'pax_count': pax_count, 'non_ref': non_ref,
                                          'segs':segs, 'rbds': rbds, 'cabins': cabins, 'meals': meals})
+
+            itinerary['bags'] = baggage_allowance
+            itinerary['pricing_info'] = pricing_info
+
+
+            passenger_count = len(pricing_info)
+            seat_count = len([p for p in pricing_info if p['ptc'] != 'INF'])
+
+            for pi in pricing_info:
+                non_ref = pi['non_ref']
+
 
             flights = []
             flight_count = []
             for id, leg_id in enumerate(itin['legs']):
                 schedules = response['legDescs'][leg_id['ref'] - 1]['schedules']
                 flight_count.append(len(schedules))
-                for schedule in schedules:
+                for sched_i, schedule in enumerate(schedules):
                     flight = response['scheduleDescs'][schedule['ref'] - 1]
                     flight_details = {'departure_airport': flight['departure']['airport'],
                                       'departure_time': flight['departure']['time'][:5],
@@ -79,7 +104,8 @@ def parse_response(http_response):
                                       'arrival_time': flight['arrival']['time'][:5],
                                       'carrier': flight['carrier']['marketing'],
                                       'flight_number': flight['carrier']['marketingFlightNumber'],
-
+                                      'rbd':  pricing_info[0]['rbds'][sched_i],
+                                      'cabin':  pricing_info[0]['cabins'][sched_i],
                                       'departure_date': departure_dates[id],
                                       'arrival_date': 'empty',
 
@@ -148,20 +174,44 @@ def get_token(url="https://api-crt.cert.havail.sabre.com/v2/auth/token", paramet
 
 # @log_search
 @function_log
-def send_bfm(ori, des, sta, ret, adt, cnn=0, inf=0, options_limit=10):
-    print(f'Doing BFM for: {ori, des, sta, ret}')
+def send_bfm(origins, destinations, dates, adt, cnn=0, inf=0, options_limit=10):
+
+    sep = ','
     standard_time = '12:00:00'
     token = get_token()  # 'T1RLAQL4Bvkkv1JQ2rU8HInf2saIgaM1vBC7We2JvnCLhccKlragajr1AADAsX2e1mFwyY3SLG6mWfboD4Bbmfmdb7sm0aAFziwYxdfGvqk3lyoqQlDOlnJADSkDznenMKqwR1g8lmKJi8Xi54T38dK3L07X9IgpxcmqpgOPD5Rrs/+Y5UYKx0Akk/BTEEkutNoHaMgDlLMl7QUNp10+w04vV22BH2v0l95XDuTejBO+CG9dl130vkUj8zPrZFoZp7arm2l+c9KMDg70/T1ipx7IsnILZhJCxaL36RX00vTnr44WeIcrklXn2mmR';
     payload = '{"OTA_AirLowFareSearchRQ":{"OriginDestinationInformation":[{"DepartureDateTime":"2021-01-21T00:00:00", "DestinationLocation":{"LocationCode":"TEST"},"OriginLocation":{"LocationCode":"TEST"},"RPH":"0"},{"DepartureDateTime":"2021-01-22T00:00:00","DestinationLocation":{"LocationCode":"TEST"},"OriginLocation":{"LocationCode":"TEST"},"RPH":"1"}],"POS":{"Source":[{"PseudoCityCode":"F9CE","RequestorID":{"CompanyName":{"Code":"TN"},"ID":"1","Type":"1"}}]},"TPA_Extensions":{"IntelliSellTransaction":{"RequestType":{"Name":"200ITINS"}}},"TravelPreferences":{"TPA_Extensions":{"DataSources":{"ATPCO":"Enable","LCC":"Disable","NDC":"Disable"},"NumTrips":{}}},"TravelerInfoSummary":{"AirTravelerAvail":[{"PassengerTypeQuantity":[]}],"SeatsRequested":[1]},"Version":"1"}}'
     payload = json.loads(payload)
+    if origins[-1] == ',':origins = origins[:-1]
+    if destinations[-1] == ',':destinations = destinations[:-1]
+    if dates[-1] == ',':dates = dates[:-1]
+    origins, destinations, dates = origins.split(sep), destinations.split(sep), dates.split(sep)
 
-    payload['OTA_AirLowFareSearchRQ']['OriginDestinationInformation'][0]['OriginLocation']['LocationCode'] = ori
-    payload['OTA_AirLowFareSearchRQ']['OriginDestinationInformation'][0]['DestinationLocation']['LocationCode'] = des
-    payload['OTA_AirLowFareSearchRQ']['OriginDestinationInformation'][0]['DepartureDateTime'] = f'{sta}T{standard_time}'
 
-    payload['OTA_AirLowFareSearchRQ']['OriginDestinationInformation'][1]['OriginLocation']['LocationCode'] = des
-    payload['OTA_AirLowFareSearchRQ']['OriginDestinationInformation'][1]['DestinationLocation']['LocationCode'] = ori
-    payload['OTA_AirLowFareSearchRQ']['OriginDestinationInformation'][1]['DepartureDateTime'] = f'{ret}T{standard_time}'
+    print(f'Doing BFM for: {origins, destinations, dates}')
+    payload['OTA_AirLowFareSearchRQ']['OriginDestinationInformation'] = []
+    for i, _ in enumerate(origins):
+        ond = {'OriginLocation': {'LocationCode': origins[i]},
+               'DestinationLocation': {'LocationCode': destinations[i]},
+               'DepartureDateTime': f'{dates[i]}T{standard_time}',
+               'RPH': str(i)
+               }
+
+        payload['OTA_AirLowFareSearchRQ']['OriginDestinationInformation'].append(ond)
+
+        """payload['OTA_AirLowFareSearchRQ']['OriginDestinationInformation'][0]['OriginLocation']['LocationCode'] = origins[i]
+        payload['OTA_AirLowFareSearchRQ']['OriginDestinationInformation'][0]['DestinationLocation']['LocationCode'] = destinations[i]
+        payload['OTA_AirLowFareSearchRQ']['OriginDestinationInformation'][0]['DepartureDateTime'] = f'{dates[i]}T{standard_time}'"""
+
+        if len(origins) == 1 and len(dates) == 2: # Roundtrip
+            ond = {'OriginLocation': {'LocationCode': destinations[i]},
+                   'DestinationLocation': {'LocationCode': origins[i]},
+                   'DepartureDateTime': f'{dates[i+1]}T{standard_time}',
+                   'RPH': "1"
+                   }
+            payload['OTA_AirLowFareSearchRQ']['OriginDestinationInformation'].append(ond)
+            """payload['OTA_AirLowFareSearchRQ']['OriginDestinationInformation'][1]['OriginLocation']['LocationCode'] = origins[i]
+            payload['OTA_AirLowFareSearchRQ']['OriginDestinationInformation'][1]['DestinationLocation']['LocationCode'] = destinations[i]
+            payload['OTA_AirLowFareSearchRQ']['OriginDestinationInformation'][1]['DepartureDateTime'] = f'{dates[i+1]}T{standard_time}'"""
 
     #passengers = []
     codes = ['ADT', 'CNN', 'INF']
@@ -179,9 +229,20 @@ def send_bfm(ori, des, sta, ret, adt, cnn=0, inf=0, options_limit=10):
 
     if response.status_code != 200:
         print(response.text)
-        bfm_log(ori=ori, des=des, sta=sta, ret=ret, options_limit=options_limit, status=response.status_code,
+        bfm_log(origins=origins, destinations=destinations, dates=dates, options_limit=options_limit, status=response.status_code,
                 business_error='')
-        raise Exception(f'HTTP Error on sending BFM: {response.status_code}')
+        if response.status_code == 400:
+            with open('static/ota/rq.txt', 'w') as rq:
+                rq.write(payload)
+            with open('static/ota/rs.txt', 'w') as rs:
+                rs.write(response.text)
+            raise Exception(f'HTTP Error on sending BFM: {response.text}')
+        else:
+            with open('static/ota/rq.txt', 'w') as rq:
+                rq.write(payload)
+            with open('static/ota/rs.txt', 'w') as rs:
+                rs.write(response.text)
+            raise Exception(f'HTTP Error on sending BFM: {response.status_code | response.text}')
 
     with open('static/ota/rq.txt', 'w') as rq:
         rq.write(payload)
@@ -196,5 +257,5 @@ def send_bfm(ori, des, sta, ret, adt, cnn=0, inf=0, options_limit=10):
     except Exception as e:
         raise Exception(f'Error on Searching: {str(e)}')
     finally:
-        bfm_log(ori=ori, des=des, sta=sta, ret=ret, options_limit=options_limit, status=response.status_code,
+        bfm_log(origins=origins, destinations=destinations, dates=dates, options_limit=options_limit, status=response.status_code,
                 business_error='')

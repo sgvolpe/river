@@ -2,58 +2,63 @@
 
         <div class="row">
            <div class="col">
+               <div class="form-row">
+                       <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                           <label class="btn btn-secondary triptype active" id="rt">
+                               <input type="radio" name="options"  autocomplete="off" checked value="rt"> Roundtrip
+                          </label>
+                          <label class="btn btn-secondary triptype" id="ow" >
+                            <input type="radio" name="options" autocomplete="off" > Oneway
+                          </label>
+                          <label class="btn btn-secondary triptype" id="ot">
+                            <input type="radio" name="options"  autocomplete="off" > Other
+                          </label>
+                        </div>
+                   </div>
                <form method="GET" action="{% url 'ota:search' %}" id="search-form">
                    {% csrf_token %}
+                   <div class="sgv_divider"></div>
+
+                   <div class="form-row" >
+                       <div class="col" id="onds"></div>
+                       <div class="col-2" ><button id="submit-btn" type="submit" class="btn btn-dark btn-lg">Search</button></div>
+                   </div>
                    <div class="form-row">
-                       <div class="form-group col-md-2"></div>
-                       <div class="form-group col-md-4">
-                           <label for="input_origin">Origin</label>
-                           <input type="text" class="form-control" id="input_origin" name="ori" placeholder="Origin" value="MVD">
-                           <label for="input_start_date">Start Date</label>
-                           <input type="date" class="form-control" id="input_start_date" name="sta" placeholder="Start Date" >
-                    </div>
-                    <div class="form-group col-md-4">
-                      <label for="input_destination">Destination</label>
-                      <input type="text" class="form-control" id="input_destination" name="des" placeholder="Destination" value="BUE">
-                        <label for="input_start_date">Return Date</label>
-                      <input type="date" class="form-control" id="input_end_date" name="ret" placeholder="Return Date" >
-                    </div>
-                    <div class="form-group col-md-2"></div>
+                       <div class="form-group col-md-2">
+                           <button type="button" class="btn  btn-dark btn-sm add_ond">+</button>
 
-
-                  </div>
+                       </div>
+                   </div>
                    <div class="form-row">
-
-                       <div class="form-group col-md-2"></div>
                        <div class="form-group col-md-4">
                            <div class="row">
-
-                           <div class="col-4">
-                               <label for="input_adt">Adults</label>
-                               <input type="number" class="form-control" id="input_adt" name="adt" placeholder="Adults" value="1">
+                               <div class="col-3">
+                                   <label for="input_adt">Adults</label>
+                                   <input type="number" class="form-control" id="input_adt" name="adt" placeholder="Adults" value="1">
+                               </div>
+                               <div class="col-3">
+                                   <label for="input_cnn">Child</label>
+                                   <input type="number" class="form-control" id="input_cnn" name="cnn" placeholder="Child" value="0">
+                              </div>
+                               <div class="col-3">
+                                   <label for="input_inf">Infant</label>
+                                   <input type="number" class="form-control" id="input_inf" name="inf" placeholder="Infant" value="0">
+                               </div>
                            </div>
-                           <div class="col-4">
-                               <label for="input_cnn">Child</label>
-                               <input type="number" class="form-control" id="input_cnn" name="cnn" placeholder="Child" value="0">
-                          </div>
-
-                           <div class="col-4">
-                               <label for="input_inf">Infant</label>
-                               <input type="number" class="form-control" id="input_inf" name="inf" placeholder="Infant" value="0">
-                           </div>
-                           </div>
-
                            <div class="form-check" hidden>
-                            <input name="cache" type="checkbox" class="form-check-input" id="exampleCheck1" checked>
-                            <label class="form-check-label" for="exampleCheck1">Check me out</label>
+                               <input name="cache" type="checkbox" class="form-check-input" id="exampleCheck1" checked>
+                               <label class="form-check-label" for="exampleCheck1">Check me out</label>
                           </div>
                        </div>
-                       <div class="form-group col-md-4">
-                           <button id="submit-btn" type="submit" class="btn btn-dark btn-lg">Search</button>
-                       </div>
-                       <div class="form-group col-md-2"></div>
                    </div>
+
                    <div class="sgv_divider"></div>
+
+
+                   <input type="text" name="origins" id="origins">
+                   <input type="text" name="destinations" id="destinations">
+                   <input type="text" name="dates" id="dates">
+                   <div class="form-group col-md-2" id="test"></div>
                 </form>
            </div>
         </div>
@@ -63,45 +68,188 @@
         <div class="row"></div>
 
     </div>
+<script id="ond_adding">
+    function add_ond(){
+            el = $('#onds') ;
+            new_html = '<div class="row"><div class="form-group col-md-3"><input type="text" class="form-control origin" placeholder="Origin" value="BUE">'
+            new_html += '</div><div class="form-group col-md-3"><input type="text" class="form-control destination"  placeholder="Destination" value="MVD">'
+            new_html += '</div><div class="form-group col-md-3"><input type="date" class="form-control" class="form-control date input_end_date"  placeholder="Start Date" ></div>'
+            new_html += '<div class="form-group col-md-3"></div></div>'
+            el.html(el.html() + new_html)
+            load_listeners() ;
+            add_dates() ;
 
+
+    } ;
+
+    $('.add_ond').click(function(){
+        add_ond() ;
+    }) ;
+
+</script>
+<script id="trip_typing">
+
+    $('.triptype').click(function(e, el){
+        triptype = $(this).attr("id") ;
+        if (triptype == 'rt'){
+            html = '<div class="row"><div class="form-group col-md-3"><!--label for="input_origin">Origin</label--><input type="text" class="form-control origin" placeholder="Origin" value="MVD">'
+            html += '</div><div class="form-group col-md-3"><!--label for="input_destination">Destination</label--><input type="text" class="form-control destination" placeholder="Destination" value="BUE">'
+            html += '</div><div class="form-group col-md-3"><!--label for="input_start_date">Start Date</label--><input type="date" class="form-control date input_start_date"  placeholder="Start Date" >'
+            html += '</div><div class="form-group col-md-3"><!--label for="input_start_date">Return Date</label--><input type="date" class="form-control date input_end_date"   placeholder="Return Date" ></div></div>'
+            $('.add_ond').hide()
+        }else{
+            if (triptype == 'ow'){
+                html = '<div class="row"><div class="form-group col-md-3"><!--label for="input_origin">Origin</label--><input type="text" class="form-control origin" placeholder="Origin" value="MVD">'
+                html += '</div><div class="form-group col-md-3"><!--label for="input_destination">Destination</label--><input type="text" class="form-control destination" placeholder="Destination" value="BUE">'
+                html += '</div><div class="form-group col-md-3"><!--label for="input_start_date">Start Date</label--><input type="date" class="form-control date" placeholder="Start Date" >'
+                html += '</div><div class="form-group col-md-3"></div></div>'
+                $('.add_ond').hide()
+            }else{
+                html = '<div class="row"><div class="form-group col-md-3"><input type="text" class="form-control origin" placeholder="Origin" value="MVD">'
+                html += '</div><div class="form-group col-md-3"><input type="text" class="form-control destination" placeholder="Destination" value="BUE">'
+                html += '</div><div class="form-group col-md-3"><input type="date" class="form-control date input_start_date" placeholder="Date" >'
+                //html += '</div><div class="form-group col-md-3"></div></div><input type="button" class="add_ond">'
+                $('.add_ond').show()
+            }
+        }
+
+        $('#onds').html(html) ;
+
+        add_dates() ;
+        load_listeners() ;
+        //prevsub();
+
+    })
+</script>
+
+<script id="contatenation_events">
+
+function get_origins(){
+    origins= '' ;
+    $('#origins').val(origins)
+    $('.origin').each(function(i, origin){
+        origins += origin.value + ',';
+    });
+    $('#origins').val(origins) ;
+} ;
+function get_destinations(){
+    destinations= '' ;
+    $('#destinations').val(destinations)
+    $('.destination').each(function(i, destination){
+        destinations += destination.value + ',';
+    });
+    $('#destinations').val(destinations) ;
+} ;
+
+function get_dates(){
+    dates= '' ;
+    $('#dates').val(dates)
+    $('.date').each(function(i, date){
+        dates += date.value + ',';
+    });
+    $('#dates').val(dates) ;
+} ;
+
+
+function load_listeners(){
+    $('.origin').change(function(){
+        get_origins() ;
+    }) ;
+    $('.destination').change(function(){
+        get_destinations() ;
+    }) ;
+    $('.date').change(function(){
+        get_dates() ;
+    }) ;
+}
+
+</script>
 <script>
-    Date.prototype.toDateInputValue = (function() {
-        var local = new Date(this);
-        local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
-        return local.toJSON().slice(0,10);
-    });
-
-    Date.prototype.addDays = function(days) {
-        var date = new Date(this.valueOf());
-        date.setDate(date.getDate() + days);
-        return date;
-    }
 
 
-    $("#input_start_date").val(new Date().toDateInputValue());
-    $("#input_end_date").val(new Date().addDays(7).toDateInputValue());
 
-    $("#input_start_date").change(function() {
-        start = new Date($("#input_start_date").val());
-        end = new Date($("#input_end_date").val()) ;
+function prevsub(){
+   $('form').submit(function(){
+      event.preventDefault();
+      origins = '' ;
+      destinations = '' ;
+      dates = '' ;
 
-        const diffTime = Math.abs(end - start);
-        los = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      //do_thing() ;
 
-        if(start > end){
-            $("#input_end_date").val(start.addDays(7).toDateInputValue());
+       //$(this).submit();
+
+   });
+}
+//prevsub()
+
+
+
+
+</script>
+
+<script id="add_dates">
+
+    function add_dates(){
+
+        Date.prototype.toDateInputValue = (function() {
+            var local = new Date(this);
+            local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
+            return local.toJSON().slice(0,10);
+        });
+
+        Date.prototype.addDays = function(days) {
+            var date = new Date(this.valueOf());
+            date.setDate(date.getDate() + days);
+            return date;
         } ;
+
+        $(".date").val(new Date().toDateInputValue());
+        $("#input_end_date").val(new Date().addDays(7).toDateInputValue());
+
+
+        $(".input_start_date").change(function() {
+            start = new Date($(".input_start_date").val());
+            end = new Date($(".input_end_date").val()) ;
+
+            const diffTime = Math.abs(end - start);
+            los = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if(start > end){
+                $(".input_end_date").val(start.addDays(7).toDateInputValue());
+            } ;
+        }) ;
+
+        $(".input_end_date").change(function() {
+            start = new Date($(".input_start_date").val());
+            end = new Date($(".input_end_date").val()) ;
+
+            const diffTime = Math.abs(end - start);
+            los = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if(start > end){
+                $(".input_start_date").val(end.addDays(-7).toDateInputValue());
+            } ;
     });
 
-    $("#input_end_date").change(function() {
-        start = new Date($("#input_start_date").val());
-        end = new Date($("#input_end_date").val()) ;
 
-        const diffTime = Math.abs(end - start);
-        los = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-        if(start > end){
-            $("#input_start_date").val(end.addDays(-7).toDateInputValue());
-        } ;
-    });
+    } ; //dates
+
+
+
+
+
+
+</script>
+
+<script id="document_ready">
+    $(document).ready(
+        function() {
+            $( "#rt" ).click();
+            get_destinations() ;
+            get_origins() ;
+            get_dates() ;
+        }
+    );
 </script>
