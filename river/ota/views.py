@@ -1,6 +1,6 @@
 __author__ = 'SGV'
 
-import datetime, json
+import datetime, json, random
 from collections import Counter
 
 from .models import Itinerary, Passenger, Reservation, Search
@@ -67,7 +67,7 @@ def search_backend(origins, destinations, dates, adt, cnn, inf, options_limit=50
     elif cache:
         if DEBUG: print(f'Trying to retrieve from Cache')
         # Check if there is any info
-        search = Search.objects.filter(origins=origins, destinations=destinations, adt=int(adt), cnn=int(cnn), inf=int(inf), dates=dates)
+        search = Search.objects.filter(origins=origins, destinations=destinations, dates=dates, adt=int(adt), cnn=int(cnn), inf=int(inf))
         print (search)
 
         if len(search) > 0:
@@ -80,7 +80,7 @@ def search_backend(origins, destinations, dates, adt, cnn, inf, options_limit=50
             if cache_age_minutes > 15:
                 if DEBUG: print(f'Cache too old:{cache_age_minutes} minutes')
                 try:
-                    search = store_new_search(origins=origins, destinations=destinations, adt=adt, cnn=cnn, inf=inf,
+                    search = store_new_search(origins=origins, destinations=destinations, dates=dates, adt=adt, cnn=cnn, inf=inf,
                                               options_limit=options_limit, search=search[id])
                     search_id = search.pk
                 except Exception as e:
@@ -115,22 +115,12 @@ def search(request):
     try:
 
         request_search_id = request.GET.get('search_id', False)
-
-       # ori = request.GET.get('ori', '').upper()
-        #des = request.GET.get('des', '').upper()
-        # sta = request.GET.get('sta')
-        # ret = request.GET.get('ret')
-
         origins = request.GET.get('origins', '').upper()
         destinations = request.GET.get('destinations', '').upper()
         dates = request.GET.get('dates', '')
-
-
         adt = int(request.GET.get('adt', 1))
         cnn = int(request.GET.get('cnn', 0))
         inf = int(request.GET.get('inf', 0))
-
-
         cache = request.GET.get('cache', 'off') == 'on'
         search_id = request.GET.get('search_id', False)
 
@@ -146,23 +136,47 @@ def search(request):
             print(request.headers['User-Agent'])
             print(request.GET)
 
-        search, search_id = search_backend(origins, destinations, dates, adt, cnn, inf, options_limit, request_search_id, cache)#sta, ret,
+        search, search_id = search_backend(origins, destinations, dates, adt, cnn, inf, options_limit, request_search_id, cache) #sta, ret,
         itineraries = search.pull()
         total_options_number = len(itineraries.keys())
+
+
 
         if DEBUG:
             with open('static/ota/itineararies.txt', 'w') as rq:
                 rq.write(json.dumps(itineraries))
 
         # Filter and Truncate
-        def filter_itineraries(itineraries, **kwargs):
+        def filter_itineraries(itineraries: dict, **kwargs) -> dict:
             for filter, value in kwargs.items():
                 if value != '':
                     itineraries = {k: v for k, v in itineraries.items() if v[filter] == value}
             return itineraries
 
+        def get_quickest(itineraries: dict):
+            quickest_itin, quickest_time = None, 999999
+            for k, it in itineraries.items():
+                tt = it['travel_time']
+                if tt < quickest_time:
+                    quickest_itin, quickest_time = it, tt
+            return quickest_itin
+
+        def get_cheapest(itineraries: dict):
+            cheapest_itin, cheapest_price = None, 999999
+            for k, it in itineraries.items():
+                price = it['total_price']
+                if price < cheapest_price:
+                    cheapest_itin, cheapest_price = it, price
+            return cheapest_itin
+
         itineraries = filter_itineraries(itineraries, main_carrier=main_carrier)
+
+        times = [it['travel_time'] for k, it in itineraries.items()]
+
+        selected_itins = {'quickest_itin': get_quickest(itineraries), 'cheapest_itin': get_cheapest(itineraries)}
         airlines_counter = dict(Counter([itin['main_carrier'] for itin_id, itin in itineraries.items()]))
+
+
 
         # itineraries = {k: v for k, v in itineraries.items() if offset <= int(k) < offset + limit}
         itineraries = {i: v for i, v in enumerate(itineraries.values()) if offset <= int(i) < offset + limit}
@@ -175,7 +189,7 @@ def search(request):
                                'search_id': search_id, 'limit': limit, 'offset': offset,
                                'total_options_number': total_options_number,
                                'airlines_counter': airlines_counter,
-                               'stats': stats,
+                               'stats': stats, 'selected_itins': selected_itins
                                })
     except Exception as e:
         return render(request, 'ota/results.html', context={'ERROR': e})
@@ -203,19 +217,25 @@ class search_details(DetailView):
         return context
 
 
-def populate_cache():
-    airports = ['MVD', 'BUE']
+def populate_cache(request):
+    print ('POPULATING')
+    import numpy as np
+    airports = ['MVD', 'BUE', 'SCL', 'MIA', 'NYC', 'SYD', 'MAD', 'MEX', 'LON']
     for ori in airports:
         for des in airports:
+            print (des)
             for sta, ret in Handyman.generate_date_pairs():
                 print(ori, des, sta, ret)
                 try:
-                    search_backend(ori, des, dates=f'{sta},{ret}', cache=True)
+                    adt = np.random.choice([1,2,3], p =[.7,.2,.1])
+                    cnn = np.random.choice([0,1,2], p =[.8,.1,.1])
+                    inf = np.random.choice([0,1,2], p =[.8,.1,.1])
+                    search_backend(origins=ori, destinations=des, dates=f'{sta},{ret}', cache=True,  adt=adt, cnn=cnn, inf=inf)
                 except Exception as e:
                     print(str(e))
+    return HttpResponse('asd')
 
 
-populate_cache()
 
 def see_itinerary(request, pk):
     itinerary = Itinerary.objects.get(pk=pk).get_json()
@@ -285,8 +305,10 @@ def index(request):
 
 def checkout(request, pk):
     itinerary = Itinerary.objects.get(pk=pk).get_json()
+
+    print (f"PTC C:{ itinerary['passenger_count']}")
     return render(request, 'ota/checkout.html', context={'test': 'test', 'ERROR': False, 'itinerary': itinerary,
-                                                         'passengers': {k: '' for k in range(1, 2, 1)},
+                                                         'passengers': {k: '' for k in range(1, itinerary['passenger_count']+1, 1)},
                                                          })
 
 def reservation_details(request, pk):
@@ -300,6 +322,14 @@ def reservation_details(request, pk):
 
 
 def create_reservation(request):
+
+
+    names = request.POST.get('names', None).split(',')
+    surnames = request.POST.get('surnames', None).split(',')
+    phones = request.POST.get('phones', None).split(',')
+
+    if DEBUG: print(f'****CREATING RESERVATION:{names, surnames, phones}')
+
     name1 = request.POST.get('name1', None)
     surname1 = request.POST.get('surname1', None)
     phone1 = request.POST.get('phone1', None)
@@ -332,8 +362,11 @@ def create_reservation(request):
     reservation.add_passenger(passenger)
     reservation.save()
 
-    context = {'itinerary': itinerary, 'passengers': passengers, 'reservation': reservation}
-    return redirect(reservation)
+    context = {'itinerary': itinerary, 'passengers': passengers, 'reservation': reservation, 'checkout': 'no',
+               'itinerary_id': itinerary_id}
+
+    if DEBUG: print ('*****************CREATED')
+    return redirect(reservation, context=context)
 
 
     return HttpResponse('ok')

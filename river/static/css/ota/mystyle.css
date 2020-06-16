@@ -22,6 +22,7 @@ navbar{
 
 .search-box input {
     border-radius: 0;
+    padding: 5px;
 }
 
 .search-box{
@@ -63,7 +64,7 @@ navbar{
 }
 
 .itinerary_container{
-    color:black;
+    color: var(--primary_color);
     background-color:white;
     width=80%
     margin: 20px auto;
@@ -92,4 +93,34 @@ navbar{
 @media screen and (max-height: 450px) {
   .sidenav {padding-top: 15px;}
   .sidenav a {font-size: 18px;}
+}
+
+.airline_icon{
+    width: auto;
+    height: auto;
+    min-width: inherit;
+    margin-left: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    position: absolute;
+    z-index: 1;
+    margin: 0 5px 8px;
+    border-radius: 50%;
+    box-shadow: 0 2px 3px 1px rgba(0,0,0,.1);
+        margin: 0 5px 8px;
+}
+.itinerary_row{
+padding: 15px ;
+}
+
+.center {
+  margin: auto;
+
+
+  padding: 10px;
+}
+
+footer{
+    background: var(--primary_color);
+    color: var(--font_color);
 }

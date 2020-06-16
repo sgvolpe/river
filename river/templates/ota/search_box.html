@@ -2,22 +2,10 @@
 
         <div class="row">
            <div class="col">
-               <div class="form-row">
-                       <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                           <label class="btn btn-secondary triptype active" id="rt">
-                               <input type="radio" name="options"  autocomplete="off" checked value="rt"> Roundtrip
-                          </label>
-                          <label class="btn btn-secondary triptype" id="ow" >
-                            <input type="radio" name="options" autocomplete="off" > Oneway
-                          </label>
-                          <label class="btn btn-secondary triptype" id="ot">
-                            <input type="radio" name="options"  autocomplete="off" > Other
-                          </label>
-                        </div>
-                   </div>
                <form method="GET" action="{% url 'ota:search' %}" id="search-form">
                    {% csrf_token %}
                    <div class="sgv_divider"></div>
+
 
                    <div class="form-row" >
                        <div class="col" id="onds"></div>
@@ -51,7 +39,19 @@
                           </div>
                        </div>
                    </div>
-
+                    <div class="form-row">
+                       <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                           <label class="btn btn-secondary triptype active" id="rt">
+                               <input type="radio" name="options"  autocomplete="off" checked value="rt"> Roundtrip
+                          </label>
+                          <label class="btn btn-secondary triptype" id="ow" >
+                            <input type="radio" name="options" autocomplete="off" > Oneway
+                          </label>
+                          <label class="btn btn-secondary triptype" id="ot">
+                            <input type="radio" name="options"  autocomplete="off" > Other
+                          </label>
+                        </div>
+                   </div>
                    <div class="sgv_divider"></div>
 
 

@@ -20,7 +20,9 @@ urlpatterns = [
     path('search_details/<int:pk>/', views.search_details.as_view(), name='search_details'),
 
     path('get_airports/<str:text>', views.get_airports, name='get_airports'),
+
     path('conversion', views.conversion, name='conversion'),
+    path('populate_cache', views.populate_cache, name='populate_cache'),
 
 
 

@@ -93,8 +93,60 @@ def get_airports(text='New', limit=10):
 
     df['x'] = '(' + df['iata_code'] + ') ' + df['name'] + ', ' + df['municipality']
     if text != '*':
-        df = df[df['x'].str.contains(text, regex=False)]
+        df = df[df['x'].apply(lambda  x: x.upper()).str.contains(text.upper(), regex=False)]
     df = df.head(limit)
     data = [{'x': row['x'], 'iata': row['iata_code'] } for i, row in df.iterrows()]
     return data
 
+
+import requests, os
+
+i_path = r'C:\Users\sg0216333\OneDrive - Sabre\- PrOjEcTs\river\river\static\images\ota\airline_logos_bu'
+o_path = r'C:\Users\sg0216333\OneDrive - Sabre\- PrOjEcTs\river\river\static\images\ota\airline_logos'
+
+
+def save_cxr(cxr):
+    rem = False
+    if f'{cxr}.png' not in os.listdir(o_path):
+        print(cxr)
+        with open(f'{o_path}/{cxr}.png', 'wb') as handle:
+            URL = f'https://www.toctocviajes.com/content/img/Airlines/{cxr}.png'
+            print(URL)
+            response = requests.get(URL, stream=True)
+            response.raw.decode_content = True
+            if '<!DOCTYPE html>' in response.text:
+                rem = True
+            else:
+                print(response.text)
+            if not response.ok:
+                print(response)
+
+            for block in response.iter_content(1024):
+                if not block:
+                    break
+
+                    handle.write(block)
+
+        if rem:
+            os.remove(f'{o_path}/{cxr}.png')
+        else:
+            pass
+
+def download_airline_icons(base_url):
+    i_path = r'C:\Users\sg0216333\OneDrive - Sabre\- PrOjEcTs\river\river\static\images\ota\airline_logos_bu'
+    o_path = r'C:\Users\sg0216333\OneDrive - Sabre\- PrOjEcTs\river\river\static\images\ota\airline_logos'
+    def save_cxr(cxr):
+        if f'{cxr}.ico' not in os.listdir(o_path):
+            url = f'{base_url}/content/img/Airlines/{cxr}.png'
+            print(url)
+            r = requests.get(url, allow_redirects=True)
+            if '<!DOCTYPE html>' in r.text:
+                pass
+            else:
+                open(f'{o_path}/{cxr}.ico', 'wb').write(r.content)
+
+
+    cxrs = [cxr.split('.')[0] for cxr in os.listdir(i_path)]
+
+    for cxr in cxrs:
+        save_cxr(cxr)

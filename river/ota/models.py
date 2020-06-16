@@ -18,6 +18,7 @@ class Search(models.Model):
     updated = models.DateTimeField(blank=True, null=True)
     hits = models.IntegerField(blank=True, null=True, default=0)
     cheapest_price = models.FloatField(default=999999)
+    quickest_time = models.PositiveIntegerField(default=0)
 
     def save_results(self, results) -> None:
         self.save()
@@ -27,8 +28,10 @@ class Search(models.Model):
             itin.save()
 
         itineraries = Itinerary.objects.filter(search_id=self.pk)
-        prices = [itin.total_price for itin in itineraries]
-        self.cheapest_price = min(prices)
+
+        self.cheapest_price = min([itin.total_price for itin in itineraries])
+        self.quickest_time = min([itin.travel_time for itin in itineraries])
+
         if self.created is None:
             self.created = datetime.datetime.now()
         self.updated = datetime.datetime.now()
@@ -67,6 +70,10 @@ class Itinerary(models.Model):
     itinerary_arrival_time = models.CharField(max_length=5, blank=True)
     currency = models.CharField(max_length=3, default='USD')
     total_price = models.FloatField(default=0.0)
+    travel_time = models.PositiveIntegerField(default=0)
+    passenger_count = models.PositiveIntegerField(default=0)
+    seat_count = models.PositiveIntegerField(default=0)
+
 
     def create_(self, itinerary):
         def parse_flight_number(f_num: int) -> str:
@@ -79,6 +86,10 @@ class Itinerary(models.Model):
         self.itinerary_departure_time = itinerary['itinerary_departure_time']
         self.currency = itinerary['currency']
         self.total_price = itinerary['total_price']
+        self.travel_time = itinerary['travel_time']
+        self.passenger_count = itinerary['passenger_count']
+        self.seat_count = itinerary['seat_count']
+
 
         sep = '|'
 
@@ -143,6 +154,8 @@ class Reservation(models.Model):
 
     def get_ond(self):
         return (self.itinerary_id.itinerary_origin+"-"+self.itinerary_id.itinerary_destination)
+
+
 
 
 class Passenger(models.Model):

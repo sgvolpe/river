@@ -53,6 +53,7 @@ def parse_response(http_response):
                     rbds, cabins = [], []
                     ptc = passenger_fare['passengerInfo']['passengerType']
                     pax_count = passenger_fare['passengerInfo']['passengerNumber']
+                    #pax_count = passenger_fare['passengerInfo']['passengerNumber']
                     non_ref = passenger_fare['passengerInfo']['nonRefundable']
                     bag_infos = passenger_fare['passengerInfo']['baggageInformation']
 
@@ -77,13 +78,19 @@ def parse_response(http_response):
                         print(f'error: {str(e)}')
 
                     pricing_info.append({'ptc': ptc, 'pax_count': pax_count, 'non_ref': non_ref,
-                                         'segs': segs, 'rbds': rbds, 'cabins': cabins, 'meals': meals})
+                                         'segs': segs, 'rbds': rbds, 'cabins': cabins, 'meals': meals,
 
-            itinerary['bags'] = baggage_allowance
-            itinerary['pricing_info'] = pricing_info
+                                         })
+
 
             passenger_count = len(pricing_info)
             seat_count = len([p for p in pricing_info if p['ptc'] != 'INF'])
+            itinerary['bags'] = baggage_allowance
+            itinerary['pricing_info'] = pricing_info
+            itinerary['passenger_count'] = passenger_count
+            itinerary['seat_count'] = seat_count
+
+
 
             for pi in pricing_info:
                 non_ref = pi['non_ref']
@@ -105,6 +112,8 @@ def parse_response(http_response):
                                       'cabin': pricing_info[0]['cabins'][sched_i],
                                       'departure_date': departure_dates[id],
                                       'arrival_date': 'empty',
+                                      'elapsed_time': flight['elapsedTime'],
+
 
                                       }
 
@@ -130,6 +139,7 @@ def parse_response(http_response):
                 carrier_count = Counter(c for c in itinerary['itin_carriers'].split('-'))
                 count_carrier = {v: k for k, v in carrier_count.items()}
                 itinerary['main_carrier'] = count_carrier[max(count_carrier.keys())]
+                itinerary['travel_time'] = sum([f['elapsed_time'] for f in flights])
 
                 itinerary['itinerary_origin'] = translate_iata(flights[0]['departure_airport'])
 
@@ -186,7 +196,7 @@ def send_bfm(origins, destinations, dates, adt, cnn=0, inf=0, options_limit=10):
     sep = ','
     standard_time = '12:00:00'
     token = get_token()  # 'T1RLAQL4Bvkkv1JQ2rU8HInf2saIgaM1vBC7We2JvnCLhccKlragajr1AADAsX2e1mFwyY3SLG6mWfboD4Bbmfmdb7sm0aAFziwYxdfGvqk3lyoqQlDOlnJADSkDznenMKqwR1g8lmKJi8Xi54T38dK3L07X9IgpxcmqpgOPD5Rrs/+Y5UYKx0Akk/BTEEkutNoHaMgDlLMl7QUNp10+w04vV22BH2v0l95XDuTejBO+CG9dl130vkUj8zPrZFoZp7arm2l+c9KMDg70/T1ipx7IsnILZhJCxaL36RX00vTnr44WeIcrklXn2mmR';
-    payload = '{"OTA_AirLowFareSearchRQ":{"OriginDestinationInformation":[{"DepartureDateTime":"2021-01-21T00:00:00", "DestinationLocation":{"LocationCode":"TEST"},"OriginLocation":{"LocationCode":"TEST"},"RPH":"0"},{"DepartureDateTime":"2021-01-22T00:00:00","DestinationLocation":{"LocationCode":"TEST"},"OriginLocation":{"LocationCode":"TEST"},"RPH":"1"}],"POS":{"Source":[{"PseudoCityCode":"F9CE","RequestorID":{"CompanyName":{"Code":"TN"},"ID":"1","Type":"1"}}]},"TPA_Extensions":{"IntelliSellTransaction":{"RequestType":{"Name":"200ITINS"}}},"TravelPreferences":{"TPA_Extensions":{"DataSources":{"ATPCO":"Enable","LCC":"Disable","NDC":"Disable"},"NumTrips":{}}},"TravelerInfoSummary":{"AirTravelerAvail":[{"PassengerTypeQuantity":[]}],"SeatsRequested":[1]},"Version":"1"}}'
+    #payload = '{"OTA_AirLowFareSearchRQ":{"OriginDestinationInformation":[{"DepartureDateTime":"2021-01-21T00:00:00", "DestinationLocation":{"LocationCode":"TEST"},"OriginLocation":{"LocationCode":"TEST"},"RPH":"0"},{"DepartureDateTime":"2021-01-22T00:00:00","DestinationLocation":{"LocationCode":"TEST"},"OriginLocation":{"LocationCode":"TEST"},"RPH":"1"}],"POS":{"Source":[{"PseudoCityCode":"F9CE","RequestorID":{"CompanyName":{"Code":"TN"},"ID":"1","Type":"1"}}]},"TPA_Extensions":{"IntelliSellTransaction":{"RequestType":{"Name":"200ITINS"}}},"TravelPreferences":{"TPA_Extensions":{"DataSources":{"ATPCO":"Enable","LCC":"Disable","NDC":"Disable"},"NumTrips":{}}},"TravelerInfoSummary":{"AirTravelerAvail":[{"PassengerTypeQuantity":[]}],"SeatsRequested":[1]},"Version":"1"}}'
 
     payload = open('resources/ota/bfm_payloads/standard_rq.txt').read()
     payload = json.loads(payload)

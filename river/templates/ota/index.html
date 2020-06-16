@@ -4,6 +4,11 @@
     <title>Shop</title>
 {% endblock %}
 {% block content %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
     <div class="container" >
         <div class="row" id="header" >
             {% include 'ota/search_box.html' %}
@@ -42,59 +47,7 @@
             <div class="col"><h4>Us</h4></div>
 
         </div>
+        {% include 'ota/_footer.html'%}
     </div>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
-  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-
-
-<!--script>
-
-    $("#search-form").submit(function(e){
-        e.preventDefault();
-        alert() ;
-        des ='BUE';
-        ori = 'MVD' ;
-
-    token = 'T1RLAQL4Bvkkv1JQ2rU8HInf2saIgaM1vBC7We2JvnCLhccKlragajr1AADAsX2e1mFwyY3SLG6mWfboD4Bbmfmdb7sm0aAFziwYxdfGvqk3lyoqQlDOlnJADSkDznenMKqwR1g8lmKJi8Xi54T38dK3L07X9IgpxcmqpgOPD5Rrs/+Y5UYKx0Akk/BTEEkutNoHaMgDlLMl7QUNp10+w04vV22BH2v0l95XDuTejBO+CG9dl130vkUj8zPrZFoZp7arm2l+c9KMDg70/T1ipx7IsnILZhJCxaL36RX00vTnr44WeIcrklXn2mmR' ;
-    payload = '{"OTA_AirLowFareSearchRQ": { "OriginDestinationInformation": [{"DepartureDateTime": "2021-01-21T00:00:00", "DestinationLocation": {"LocationCode":"'
-    payload += des
-    payload += '"}, "OriginLocation": { "LocationCode":"'
-    payload += ori
-    payload +='"},        "RPH": "0"      },      {        "DepartureDateTime": "2021-01-22T00:00:00",        "DestinationLocation": { "LocationCode":"'
-    payload += ori
-    payload += '"},        "OriginLocation": {"LocationCode":"'
-    payload += des
-    payload += '"},        "RPH": "1"      }    ],    "POS": {      "Source": [        {          "PseudoCityCode": "F9CE",          "RequestorID": {            "CompanyName": {              "Code": "TN"            },            "ID": "1",            "Type": "1"          }        }      ]    },    "TPA_Extensions": {      "IntelliSellTransaction": {        "RequestType": {          "Name": "200ITINS"        }      }    },    "TravelPreferences": {      "TPA_Extensions": {        "DataSources": {          "ATPCO": "Enable",          "LCC": "Disable",          "NDC": "Disable"        },        "NumTrips": {}      }    },    "TravelerInfoSummary": {      "AirTravelerAvail": [        {          "PassengerTypeQuantity": [            {              "Code": "ADT",              "Quantity": 1            }          ]        }      ],      "SeatsRequested": [        1      ]    },    "Version": "1"  }}' ;
-
-    console.log('Start') ;
-
-
-            var settings = {
-                "async": false,
-                "crossDomain": true,
-                "url": "https://api-crt.cert.havail.sabre.com/v2/offers/shop",
-                "method": "POST",
-                "headers": {'content-type': 'application/json', 'Authorization': 'Bearer ' + token},
-                "data": payload,
-            }
-
-            $.ajax(settings).done(function (response) {
-                itin_num = response.groupedItineraryResponse.statistics.itineraryCount;
-                alert(itin_num);
-
-
-                $.post('results', {
-                    'csrfmiddlewaretoken': $("input[name='csrfmiddlewaretoken']").val(),
-                    'options':'asdasd'
-                 }) ;
-
-
-            });
-            //#this.submit();
-    });
-</script-->
 {% endblock %}

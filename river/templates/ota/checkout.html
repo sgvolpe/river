@@ -11,8 +11,9 @@
             Sorry! {{ERROR}}
         {% else %}
         <div class="row">
+            <code>{{itinerary.id}}</code>
         <div class="col-6">
-            {% include 'ota/passenger_form.html' with itinerary_id=itinerary.id%}
+            {% include 'ota/passenger_form.html' with itinerary_id=itinerary.id passengers=passengers %}
         </div>
         <div class="col-6">
             <div class="row">
