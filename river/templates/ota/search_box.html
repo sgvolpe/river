@@ -55,10 +55,10 @@
                    <div class="sgv_divider"></div>
 
 
-                   <input type="text" name="origins" id="origins">
-                   <input type="text" name="destinations" id="destinations">
-                   <input type="text" name="dates" id="dates">
-                   <div class="form-group col-md-2" id="test"></div>
+                   <input type="text" name="origins" id="origins" hidden>
+                   <input type="text" name="destinations" id="destinations" hidden>
+                   <input type="text" name="dates" id="dates" hidden>
+                   <div class="form-group col-md-2" id="test" hidden></div>
                 </form>
            </div>
         </div>
@@ -68,16 +68,74 @@
         <div class="row"></div>
 
     </div>
+
+
+
+</div>
+<script>
+
+    $(document).ready(function () {
+    function predict (){
+        $(".test").on("input", function () {
+            var options = {};
+            options.url = "get_airports/" + $(this).val();
+            options.type = "GET";
+            //options.data = { "criteria": $("").val() };
+            options.dataType = "json";
+            options.success = function (data) {
+
+                list = $("#"+$('.test').attr('list').toString()) // $("#iata_list") //
+                console.log(list)
+                list.empty() ; //$("#iata_list").empty();
+                for(var i=0;i<data.length;i++)
+                {
+                    list.append("<option label='" +
+                    data[i].x + "' value='" +
+                    data[i].iata + "'></option>");
+                }
+            };
+            $.ajax(options);
+        });
+
+        $(".origin").on("input", function () {
+            var options = {};
+            options.url = "get_airports/" + $(this).val();
+            options.type = "GET";
+            //options.data = { "criteria": $("").val() };
+            options.dataType = "json";
+            options.success = function (data) {
+
+                list = $("#"+$('.test').attr('list').toString()) // $("#iata_list") //
+                console.log(list)
+                list.empty() ; //$("#iata_list").empty();
+                for(var i=0;i<data.length;i++)
+                {
+                    list.append("<option label='" +
+                    data[i].x + "' value='" +
+                    data[i].iata + "'></option>");
+                }
+            };
+            $.ajax(options);
+        });
+    }
+    predict ()
+
+});
+</script>
+
+
+
 <script id="ond_adding">
     function add_ond(){
             el = $('#onds') ;
-            new_html = '<div class="row"><div class="form-group col-md-3"><input type="text" class="form-control origin" placeholder="Origin" value="BUE">'
-            new_html += '</div><div class="form-group col-md-3"><input type="text" class="form-control destination"  placeholder="Destination" value="MVD">'
+            new_html = '<div class="row"><div class="form-group col-md-3"><input type="text" class="form-control origin" placeholder="Origin" value="BUE" list="origin_list"><datalist id="origin_list">'
+            new_html += '</div><div class="form-group col-md-3"><input type="text" class="form-control destination"  placeholder="Destination" value="MVD" list="origin_list"><datalist id="origin_list">'
             new_html += '</div><div class="form-group col-md-3"><input type="date" class="form-control" class="form-control date input_end_date"  placeholder="Start Date" ></div>'
             new_html += '<div class="form-group col-md-3"></div></div>'
             el.html(el.html() + new_html)
             load_listeners() ;
             add_dates() ;
+            load_autocomplete() ;
 
 
     } ;
@@ -88,25 +146,67 @@
 
 </script>
 <script id="trip_typing">
+function aload_autocomplete() {
+            var availableTags = [
+               "MVD",
+                "BUE",
+                "SCL",
+
+            ];
+            $( ".origin" ).autocomplete({
+              source: availableTags
+            });
+          }
+
+function load_autocomplete() {
+    $(".origin,.destination").on("input", function () {
+        var options = {};
+        options.url = "get_airports/" + $(this).val();
+        options.type = "GET";
+        options.dataType = "json";
+
+        options.context = $(this) ;
+        options.success = function (data, el) {
+                el = this.context
+                list = $("#"+$(this).attr('list').toString()) // $("#iata_list") //
+                //console.log(el.list)
+                el = this.context ;
+                list.empty() ; //$("#iata_list").empty();
+                for(var i=0;i<data.length;i++)
+                {
+                    list.append("<option label='" +
+                    data[i].x + "' value='" +
+                    data[i].iata + "'></option>");
+                }
+            };
+            $.ajax(options);
+        });
+}
+    $(document).ready(
+
+
+
+
 
     $('.triptype').click(function(e, el){
+
         triptype = $(this).attr("id") ;
         if (triptype == 'rt'){
-            html = '<div class="row"><div class="form-group col-md-3"><!--label for="input_origin">Origin</label--><input type="text" class="form-control origin" placeholder="Origin" value="MVD">'
-            html += '</div><div class="form-group col-md-3"><!--label for="input_destination">Destination</label--><input type="text" class="form-control destination" placeholder="Destination" value="BUE">'
+            html = '<div class="row"><div class="form-group col-md-3"><!--label for="input_origin">Origin</label--><input type="text" class="form-control origin mdb-autocomplete" placeholder="Origin" value="MVD" list="origin_list"><datalist id="origin_list">'
+            html += '</div><div class="form-group col-md-3"><!--label for="input_destination">Destination</label--><input type="text" class="form-control destination" placeholder="Destination" value="BUE" list="origin_list"><datalist id="origin_list">'
             html += '</div><div class="form-group col-md-3"><!--label for="input_start_date">Start Date</label--><input type="date" class="form-control date input_start_date"  placeholder="Start Date" >'
             html += '</div><div class="form-group col-md-3"><!--label for="input_start_date">Return Date</label--><input type="date" class="form-control date input_end_date"   placeholder="Return Date" ></div></div>'
             $('.add_ond').hide()
         }else{
             if (triptype == 'ow'){
-                html = '<div class="row"><div class="form-group col-md-3"><!--label for="input_origin">Origin</label--><input type="text" class="form-control origin" placeholder="Origin" value="MVD">'
-                html += '</div><div class="form-group col-md-3"><!--label for="input_destination">Destination</label--><input type="text" class="form-control destination" placeholder="Destination" value="BUE">'
+                html = '<div class="row"><div class="form-group col-md-3"><!--label for="input_origin">Origin</label--><input type="text" class="form-control origin" placeholder="Origin" value="MVD" list="origin_list"><datalist id="origin_list">'
+                html += '</div><div class="form-group col-md-3"><!--label for="input_destination">Destination</label--><input type="text" class="form-control destination" placeholder="Destination" list="origin_list"><datalist id="origin_list">'
                 html += '</div><div class="form-group col-md-3"><!--label for="input_start_date">Start Date</label--><input type="date" class="form-control date" placeholder="Start Date" >'
                 html += '</div><div class="form-group col-md-3"></div></div>'
                 $('.add_ond').hide()
             }else{
-                html = '<div class="row"><div class="form-group col-md-3"><input type="text" class="form-control origin" placeholder="Origin" value="MVD">'
-                html += '</div><div class="form-group col-md-3"><input type="text" class="form-control destination" placeholder="Destination" value="BUE">'
+                html = '<div class="row"><div class="form-group col-md-3"><input type="text" class="form-control origin" placeholder="Origin" value="MVD" list="origin_list"><datalist id="origin_list">'
+                html += '</div><div class="form-group col-md-3"><input type="text" class="form-control destination" placeholder="Destination" value="BUE" list="origin_list"><datalist id="origin_list">'
                 html += '</div><div class="form-group col-md-3"><input type="date" class="form-control date input_start_date" placeholder="Date" >'
                 //html += '</div><div class="form-group col-md-3"></div></div><input type="button" class="add_ond">'
                 $('.add_ond').show()
@@ -118,8 +218,9 @@
         add_dates() ;
         load_listeners() ;
         //prevsub();
+        load_autocomplete()
 
-    })
+    }))
 </script>
 
 <script id="contatenation_events">
@@ -243,9 +344,17 @@ function prevsub(){
 
 </script>
 
+<script id="autocomplete">
+
+
+</script>
+
 <script id="document_ready">
     $(document).ready(
+
+
         function() {
+        $('.origin').autocomplete('') ;
             $( "#rt" ).click();
             get_destinations() ;
             get_origins() ;

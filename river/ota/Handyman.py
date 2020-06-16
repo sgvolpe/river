@@ -1,4 +1,7 @@
-import datetime, functools, os, time
+import datetime, functools, os, requests, time
+import pandas as pd
+
+
 from datetime import timedelta
 
 
@@ -31,7 +34,6 @@ def generate_date_pairs(base_date=datetime.datetime.now().date(), ap_list=[30, 6
 
     return [[str((add_days_to_date(base_date, int(ap)))), str((add_days_to_date(base_date, int(ap) + int(los))))]
             for ap in ap_list for los in los_list]
-
 
 
 def log(log_f_folder='LOGS', log_f_name='log.txt', to_write='START'):
@@ -70,8 +72,29 @@ def function_log(func):
         value = func(*args, **kwargs)
         end_time = time.perf_counter()  # 2
         run_time = end_time - start_time  # 3
-        log(log_f_folder='LOGS', log_f_name='function_log.txt', to_write=f"Finished {func.__name__!r} in {run_time} secs|")
+        log(log_f_folder='LOGS', log_f_name='function_log.txt',
+            to_write=f"Finished {func.__name__!r} in {run_time} secs|")
 
         return value
 
     return wrapper_timer
+
+
+def download_airports():
+    url = 'https://raw.githubusercontent.com/datasets/airport-codes/master/data/airport-codes.csv'
+
+    rs = requests.get(url)
+
+    open('../Resources/ota/airports.csv', 'wb').write(rs.content)
+
+
+def get_airports(text='New', limit=10):
+    df = pd.read_csv('Resources/ota/airports_simple.csv') # todo: upper and title
+
+    df['x'] = '(' + df['iata_code'] + ') ' + df['name'] + ', ' + df['municipality']
+    if text != '*':
+        df = df[df['x'].str.contains(text, regex=False)]
+    df = df.head(limit)
+    data = [{'x': row['x'], 'iata': row['iata_code'] } for i, row in df.iterrows()]
+    return data
+

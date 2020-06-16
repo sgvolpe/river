@@ -9,7 +9,7 @@ from . import Handyman
 from .Api import parse_response, get_token, send_bfm
 
 from django.db.models import Avg, Sum
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.utils import timezone
 
@@ -210,12 +210,12 @@ def populate_cache():
             for sta, ret in Handyman.generate_date_pairs():
                 print(ori, des, sta, ret)
                 try:
-                    search_backend(ori, des, sta=sta, ret=ret, cache=True)
+                    search_backend(ori, des, dates=f'{sta},{ret}', cache=True)
                 except Exception as e:
                     print(str(e))
 
 
-#populate_cache()
+populate_cache()
 
 def see_itinerary(request, pk):
     itinerary = Itinerary.objects.get(pk=pk).get_json()
@@ -266,6 +266,10 @@ def get_shopping_stats(request):
     most_popular = Search.objects.values('origins', 'destinations').annotate(Sum('hits')).order_by('hits__sum')
     trending_7days = Search.objects.values('origins', 'destinations').annotate(Sum('hits')).order_by('hits__sum')
     return {'most_popular': most_popular}
+
+
+def test(request):
+    return render(request, 'ota/test.html',)
 
 
 def index(request):
@@ -333,3 +337,44 @@ def create_reservation(request):
 
 
     return HttpResponse('ok')
+
+
+def get_airports(request, text='BUE', limit=10):
+
+    data = Handyman.get_airports(text, limit)
+    if DEBUG:
+        print(text)
+        print(data)
+    return JsonResponse(data, status=200, safe=False)
+
+
+def conversion(request):
+    from collections import defaultdict
+    searches = Search.objects.values('origins', 'destinations').annotate(Sum('hits')).order_by('hits__sum')
+    reservations = Reservation.objects.all()#.values('origins', 'destinations')
+
+    print (searches)
+    s = defaultdict(lambda : 0)
+    for search in searches:
+        ori = search['origins'].replace(',','')
+        des = search['destinations'].replace(',','')
+        s[f'{ori}-{des}'] += search['hits__sum']
+
+    r = defaultdict(lambda: 0)
+    for res in reservations:
+        print ('asd')
+        print (res.get_ond())
+
+        r[res.get_ond()] += 1
+
+
+    c = {}
+    for ond, hits in s.items():
+        if ond in r:
+            c[ond] = hits *1.0 / r[ond]
+        else: c[ond] = 9999
+
+    data = [s, r, c]
+    return JsonResponse(data, status=200, safe=False)
+
+

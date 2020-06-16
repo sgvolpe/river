@@ -10,6 +10,7 @@ app_name = 'ota'
 urlpatterns = [
     path('', views.index, name='index'),
     path('search', views.search, name='search'),
+    path('test', views.test, name='test'),
     path('results', views.results, name='results'),
     path('checkout/<int:pk>', views.checkout, name='checkout'),
     path('create_reservation', views.create_reservation, name='create_reservation'),
@@ -17,6 +18,9 @@ urlpatterns = [
     path('see_itinerary/<int:pk>', views.see_itinerary, name='see_itinerary'),
     path('return_something', views.return_something, name='return_something'),
     path('search_details/<int:pk>/', views.search_details.as_view(), name='search_details'),
+
+    path('get_airports/<str:text>', views.get_airports, name='get_airports'),
+    path('conversion', views.conversion, name='conversion'),
 
 
 

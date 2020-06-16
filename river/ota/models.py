@@ -141,6 +141,8 @@ class Reservation(models.Model):
         return f"/ota/reservation_details/{str(self.pk)}"
 
 
+    def get_ond(self):
+        return (self.itinerary_id.itinerary_origin+"-"+self.itinerary_id.itinerary_destination)
 
 
 class Passenger(models.Model):
