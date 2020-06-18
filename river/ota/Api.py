@@ -9,7 +9,7 @@ def bfm_log(**kwargs):
     bfm_log.close()
 
 
-DEBUG = True
+DEBUG = False
 
 
 @function_log

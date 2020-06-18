@@ -1,36 +1,61 @@
 {% load extra_tags %}
 
 
-<div class="container sidenav">
+<div class="container sidenav" xmlns:main_carrier>
+<div class="row"><div class="col">{{itinerary.0}}</div></div>
+
     <div class="row">
         <div class="col">
-            <h5>Showing {{offset}} - {{offset|add:limit}} of {{total_options_number}}</h5>
-            <span>
-                {% if offset|subtract:limit >= 0 %}
-                    <a href="{% url 'ota:search' %}?search_id={{search_id}}&offset={{offset|subtract:limit}}&ori={{ori}}&des={{des}}">Prev</a>
-                {% endif%}
-                {% if offset|add:limit <= total_options_number|add:limit %}
-                    <a href="{% url 'ota:search' %}?search_id={{search_id}}&offset={{offset|add:limit}}&ori={{ori}}&des={{des}}">Next</a>
-                {% endif%}
-            </span>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col">
-            <h4>Stats</h4>
-            <h4>{{stats}}</h4>
-            <h4>Filters</h4>
-            <h5>Airlines</h5>
-            <a href="{% url 'ota:search' %}?search_id={{search_id}}&offset={{offset}}&main_carrier=">Clear Filter</a>
+            <select class="" onchange="location = this.value;">
+                <option value="" selected>Sort By</option>
+                <option value="{% url 'ota:search' %}?search_id={{search_id}}&offset={{offset}}&main_carrier={{request.GET.main_carrier}}&sort_criteria=total_price">Total Price</option>
+                <option value="{% url 'ota:search' %}?search_id={{search_id}}&offset={{offset}}&main_carrier={{request.GET.main_carrier}}&sort_criteria=travel_time">Travel Time</option>
+            </select>
+
+            <br>
             <hr>
+            <h5>Airlines
+               {% if request.GET.main_carrier %} <small><h7><a href="{% url 'ota:search' %}?search_id={{search_id}}&offset={{offset}}&main_carrier=">Clear Filter</a></h7></small> {%endif%}
+            </h5>
 
             {% for name, count in airlines_counter.items %}
-                <span>
-                    <a href="{% url 'ota:search' %}?search_id={{search_id}}&offset={{offset}}&main_carrier={{name}}">{{name}}  ({{count}})</a>
-                </span>
+                    <a href="{% url 'ota:search' %}?search_id={{search_id}}&offset=0&main_carrier={{name}}"><div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="cxr{{name}}" onchange='handleChange(this);' value="{{name}}"
+                               {% if request.GET.main_carrier|cointains:name %} checked {% endif %}>
+                        <label class="custom-control-label" for="cxr{{name}}">{{name}}  ({{count}})</label>
+                    </div></a>
+                    <script>
+                        function handleChange(el){
+                            console.log(el)
+                            return location= "{% url 'ota:search' %}?search_id={{search_id}}&offset=0&main_carrier="+el.value
+                        }
+                    </script>
             {% endfor %}
         </div>
+
     </div>
+     <hr>
+        <br>
     <div class="row">
-        <div class="col"><h4><code>{{search_id}}</code></h4></div></div>
+        <div class="col">
+            <h6 >
+                Showing {{offset}} - {{offset|add:limit}}/ {{total_options_number}}<br>
+                {% if offset|subtract:limit >= 0 %}
+                    <a href="{{request.get_path}}?search_id={{search_id}}&offset={{offset|subtract:limit}}&main_carrier={{request.GET.main_carrier}}{%if request.GET.sort_criteria %}&sort_criteria={{request.GET.sort_criteria}}{% endif %}"><< Prev</a>
+                {% endif%}
+
+
+                {% if offset|add:limit < total_options_number %}
+                      <a href="{% url 'ota:search' %}?search_id={{search_id}}&offset={{offset|add:limit}}&main_carrier={{request.GET.main_carrier}}{%if request.GET.sort_criteria %}&sort_criteria={{request.GET.sort_criteria}}{% endif %}">Next >></a>
+                {% endif%}
+            </h6>
+
+
+
+        </div>
+    </div>
+    <div class="row" hidden>
+    <div class="col"><h4><code>{{search_id}}</code></h4></div></div>
+         <hr>
+        <br>
 </div>

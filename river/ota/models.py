@@ -21,30 +21,36 @@ class Search(models.Model):
     quickest_time = models.PositiveIntegerField(default=0)
 
     def save_results(self, results) -> None:
-        self.save()
-        for itinerar_key, itinerary_details in results.items():
-            itin = Itinerary(search_id=self)
-            itin.create_(itinerary_details)
-            itin.save()
+        try:
+            self.save()
+            for itinerar_key, itinerary_details in results.items():
+                itin = Itinerary(search_id=self)
+                itin.create_(itinerary_details)
+                itin.save()
 
-        itineraries = Itinerary.objects.filter(search_id=self.pk)
+            itineraries = Itinerary.objects.filter(search_id=self.pk)
 
-        self.cheapest_price = min([itin.total_price for itin in itineraries])
-        self.quickest_time = min([itin.travel_time for itin in itineraries])
+            self.cheapest_price = min([itin.total_price for itin in itineraries])
+            self.quickest_time = min([itin.travel_time for itin in itineraries])
 
-        if self.created is None:
-            self.created = datetime.datetime.now()
-        self.updated = datetime.datetime.now()
+            if self.created is None:
+                self.created = datetime.datetime.now()
+            self.updated = datetime.datetime.now()
 
-        self.save()
+            self.save()
+        except Exception as e:
+            raise Exception(f'Error trying to save results: {str(e)}')
 
-    def pull(self):
-        self.hits += 1
-        self.save()
-        return self.get_json()
+    def pull(self, sort_criteria='total_price') -> dict:
+        try:
+            self.hits += 1
+            self.save()
+            return self.get_json(sort_criteria=sort_criteria)
+        except Exception as e:
+            raise Exception(f'Error trying to Pull: {str(e)}')
 
-    def get_json(self):
-        itineraries = Itinerary.objects.filter(search_id=self.pk)
+    def get_json(self, sort_criteria='total_price'):
+        itineraries = Itinerary.objects.filter(search_id=self.pk).order_by(sort_criteria, 'total_price', 'travel_time')
         return {id: itinerary.get_json() for id, itinerary in enumerate(itineraries)}
 
 
@@ -73,6 +79,7 @@ class Itinerary(models.Model):
     travel_time = models.PositiveIntegerField(default=0)
     passenger_count = models.PositiveIntegerField(default=0)
     seat_count = models.PositiveIntegerField(default=0)
+    flight_count = models.CharField(max_length=50, default='2,2')
 
 
     def create_(self, itinerary):
@@ -80,59 +87,87 @@ class Itinerary(models.Model):
             """ returns a string 4 in length for flight number passed """
             return (4 - len(str(f_num))) * '0' + str(f_num)
 
-        self.main_carrier = itinerary['main_carrier']
-        self.itinerary_origin = itinerary['itinerary_origin']
-        self.itinerary_destination = itinerary['itinerary_destination']
-        self.itinerary_departure_time = itinerary['itinerary_departure_time']
-        self.currency = itinerary['currency']
-        self.total_price = itinerary['total_price']
-        self.travel_time = itinerary['travel_time']
-        self.passenger_count = itinerary['passenger_count']
-        self.seat_count = itinerary['seat_count']
+        try:
+
+            self.main_carrier = itinerary['main_carrier']
+            self.itinerary_origin = itinerary['itinerary_origin']
+            self.itinerary_destination = itinerary['itinerary_destination']
+            self.itinerary_departure_time = itinerary['itinerary_departure_time']
+            self.currency = itinerary['currency']
+            self.total_price = itinerary['total_price']
+            self.travel_time = itinerary['travel_time']
+            self.passenger_count = itinerary['passenger_count']
+            self.seat_count = itinerary['seat_count']
 
 
-        sep = '|'
 
-        self.bags = sep.join([str(b) for b in itinerary['bags']])
-        self.flight_numbers = sep.join(f['carrier'] + parse_flight_number(f['flight_number'])
-                                         for f in itinerary['flights'])
-        self.departure_airports = sep.join([f['departure_airport'] for f in itinerary['flights']])
-        self.arrival_airports = sep.join([f['arrival_airport'] for f in itinerary['flights']])
-        self.departure_times = sep.join([f['departure_time'] for f in itinerary['flights']])
-        self.arrival_times = sep.join([f['arrival_time'] for f in itinerary['flights']])
+            sep = '|'
 
-        self.departure_dates = sep.join([f['departure_date'] for f in itinerary['flights']])
-        self.arrival_dates = sep.join([f['arrival_date'] for f in itinerary['flights']])
+            self.bags = sep.join([str(b) for b in itinerary['bags']])
+            self.flight_numbers = sep.join(f['carrier'] + parse_flight_number(f['flight_number'])
+                                             for f in itinerary['flights'])
+            self.departure_airports = sep.join([f['departure_airport'] for f in itinerary['flights']])
+            self.arrival_airports = sep.join([f['arrival_airport'] for f in itinerary['flights']])
+            self.departure_times = sep.join([f['departure_time'] for f in itinerary['flights']])
+            self.arrival_times = sep.join([f['arrival_time'] for f in itinerary['flights']])
 
-        self.carriers = sep.join([f['carrier'] for f in itinerary['flights']])
-        self.rbds = sep.join([f['rbd'] for f in itinerary['flights']])
-        self.cabins = sep.join([f['cabin'] for f in itinerary['flights']])
+            self.departure_dates = sep.join([f['departure_date'] for f in itinerary['flights']])
+            self.arrival_dates = sep.join([f['arrival_date'] for f in itinerary['flights']])
+
+            self.carriers = sep.join([f['carrier'] for f in itinerary['flights']])
+            self.rbds = sep.join([f['rbd'] for f in itinerary['flights']])
+            self.cabins = sep.join([f['cabin'] for f in itinerary['flights']])
+            self.flight_count = sep.join([str(f) for f in itinerary['flight_count']])
 
 
-        self.save()
+            self.save()
+        except Exception as e:
+            raise Exception(f'Error trying to Create Itinerary: {str(e)}')
 
     def get_json(self) -> dict:
-        sep = '|'
-        d = model_to_dict(self, fields=[field.name for field in self._meta.fields])
+        try:
+            sep = '|'
+            d = model_to_dict(self, fields=[field.name for field in self._meta.fields])
 
-        flight_count = len(self.flight_numbers.split(sep))
+            flight_count = len(self.flight_numbers.split(sep))
 
-        d['bags'] = min([int(bag) for bag in self.bags.split(sep)])
+            d['bags'] = min([int(bag) for bag in self.bags.split(sep)])
 
-        d['flights'] = [{'departure_airport': self.departure_airports.split(sep)[i],
-                         'arrival_airport': self.arrival_airports.split(sep)[i],
-                         'departure_time': self.departure_times.split(sep)[i],
-                         'arrival_time': self.arrival_times.split(sep)[i],
-                         'departure_date': self.departure_dates.split(sep)[i],
-                         'arrival_date': self.arrival_dates.split(sep)[i],
-                         'carrier': self.carriers.split(sep)[i],
-                         'flight_number': self.flight_numbers.split(sep)[i],
+            d['flights'] = [{'departure_airport': self.departure_airports.split(sep)[i],
+                             'arrival_airport': self.arrival_airports.split(sep)[i],
+                             'departure_time': self.departure_times.split(sep)[i],
+                             'arrival_time': self.arrival_times.split(sep)[i],
+                             'departure_date': self.departure_dates.split(sep)[i],
+                             'arrival_date': self.arrival_dates.split(sep)[i],
+                             'carrier': self.carriers.split(sep)[i],
+                             'flight_number': self.flight_numbers.split(sep)[i],
 
-                         }
-                        for i in range(flight_count)
-                        ]
+                             }
+                            for i in range(flight_count)
+                            ]
 
-        return d
+            d['flight_count'] = [int(fc) for fc in self.flight_count.split(sep)]
+
+            leg_summary = []
+            p = 0
+            for flight_count in d['flight_count']:
+                leg = {
+                    'departure_airport': d['flights'][p]['departure_airport'],
+                    'departure_time': d['flights'][p]['departure_time'],
+                    'departure_date': d['flights'][p]['departure_date'],
+
+                    'arrival_airport': d['flights'][p + flight_count - 1]['arrival_airport'],
+                    'arrival_time': d['flights'][p +flight_count - 1]['arrival_time'],
+                    'arrival_date': d['flights'][p +flight_count - 1]['arrival_date'],
+                 }
+                p += flight_count
+                leg_summary.append(leg)
+
+            d['leg_summary'] = leg_summary
+
+            return d
+        except Exception as e:
+            raise Exception(f'Error trying to get Json: {str(e)}')
 
 
 class Reservation(models.Model):

@@ -41,7 +41,7 @@ def clear_cache():
     # #search_from_cache = []
 
 
-def store_new_search(origins, destinations, dates, adt=1, cnn=0, inf=0, options_limit=50, search=False):
+def store_new_search(origins, destinations, dates, adt=1, cnn=0, inf=0, options_limit=50, search=False) -> Search:
     if not search:
         search = Search(origins=origins, destinations=destinations, dates=dates, adt=int(adt), cnn=int(cnn), inf=int(inf))
         #search.save()
@@ -56,26 +56,31 @@ def store_new_search(origins, destinations, dates, adt=1, cnn=0, inf=0, options_
 
 
 DEBUG = True
-def search_backend(origins, destinations, dates, adt, cnn, inf, options_limit=50, request_search_id=False, cache=False):
+def search_backend(origins, destinations, dates, adt, cnn, inf, options_limit=50, request_search_id=False, cache=False,
+                   sort_criteria='total_price') -> (Search, int):
     sep = ','
     print (f'Search backend {origins, destinations, dates, options_limit, request_search_id, cache}')
     if request_search_id:
         if DEBUG: print(f'Retrieving Existing Search: {request_search_id}')
-        search = Search.objects.get(pk=request_search_id)
+        search = Search.objects.get(pk=request_search_id) # queryset
         search_id = search.pk
 
     elif cache:
         if DEBUG: print(f'Trying to retrieve from Cache')
         # Check if there is any info
         search = Search.objects.filter(origins=origins, destinations=destinations, dates=dates, adt=int(adt), cnn=int(cnn), inf=int(inf))
-        print (search)
+
 
         if len(search) > 0:
             if DEBUG: print (f'Found in cache: {len(search)}')
             id = len(search) - 1
 
-            cache_age = timezone.now() - search[id].updated
-            cache_age_minutes = cache_age.total_seconds() / 60
+            cache_age_minutes = 9999
+            try:
+                cache_age = timezone.now() - search[id].updated
+                cache_age_minutes = cache_age.total_seconds() / 60
+            except Exception as e:
+                if DEBUG: print (f'Error calculating Search Cache Age: {str(e), search}')
 
             if cache_age_minutes > 15:
                 if DEBUG: print(f'Cache too old:{cache_age_minutes} minutes')
@@ -107,6 +112,7 @@ def search_backend(origins, destinations, dates, adt, cnn, inf, options_limit=50
         except Exception as e:
             raise Exception(f'{e}')
 
+
     return search, search_id
 
 
@@ -126,18 +132,20 @@ def search(request):
 
         offset = int(request.GET.get('offset', 0))
         limit = int(request.GET.get('limit', 5))
+        sort_criteria = request.GET.get('sort_criteria', 'travel_time') # 'travel_time', 'itinerary_departure_time', 'itinerary_arrival_time'
 
         options_limit = int(request.GET.get('options_limit', 50))
         main_carrier = request.GET.get('main_carrier', '').upper()
 
         if DEBUG:
             print ('***** SEARCH ******** ')
-            print(origins, destinations, dates, adt, cache, request_search_id, offset, limit)
+            print(origins, destinations, dates, adt, cache, request_search_id, offset, limit, sort_criteria)
             print(request.headers['User-Agent'])
             print(request.GET)
 
-        search, search_id = search_backend(origins, destinations, dates, adt, cnn, inf, options_limit, request_search_id, cache) #sta, ret,
-        itineraries = search.pull()
+        search, search_id = search_backend(origins, destinations, dates, adt, cnn, inf, options_limit, request_search_id,
+                                           cache, sort_criteria=sort_criteria)
+        itineraries = search.pull(sort_criteria=sort_criteria)
         total_options_number = len(itineraries.keys())
 
 
@@ -189,7 +197,7 @@ def search(request):
                                'search_id': search_id, 'limit': limit, 'offset': offset,
                                'total_options_number': total_options_number,
                                'airlines_counter': airlines_counter,
-                               'stats': stats, 'selected_itins': selected_itins
+                               'stats': stats, 'selected_itins': {} #selected_itins
                                })
     except Exception as e:
         return render(request, 'ota/results.html', context={'ERROR': e})
@@ -261,9 +269,9 @@ def get_top_onds(top_n=50):
     return searches[:top_n]
 
 
-def get_promotions():
+def get_promotions(limit=10) -> list:
     print('*** PROMOTIONS ***')
-    print (get_top_onds())
+
     cheap_itinearies = []
     for search in get_top_onds():
         origins = search['origins']
@@ -277,15 +285,15 @@ def get_promotions():
             cheap_itinearies.append(it)
 
 
-    return cheap_itinearies
+    return cheap_itinearies[:limit]
 
 
 
 def get_shopping_stats(request):
     """ Returns a Search Queryset """
-    most_popular = Search.objects.values('origins', 'destinations').annotate(Sum('hits')).order_by('hits__sum')
-    trending_7days = Search.objects.values('origins', 'destinations').annotate(Sum('hits')).order_by('hits__sum')
-    return {'most_popular': most_popular}
+    most_popular = Search.objects.values('origins', 'destinations').annotate(Sum('hits')).order_by('hits__sum')[:10]
+    trending_7days = Search.objects.values('origins', 'destinations').annotate(Sum('hits')).order_by('hits__sum')[:10]
+    return {'most_popular': most_popular, 'trending_7days': trending_7days}
 
 
 def test(request):
@@ -297,8 +305,10 @@ def index(request):
     promotions = get_promotions()
     shopping_stats = get_shopping_stats('')
     most_popular = shopping_stats['most_popular']
+    trending_7days = shopping_stats['trending_7days']
 
     return render(request, 'ota/index.html', context={'promotions': promotions, 'most_popular': most_popular,
+                                                      'trending_7days': trending_7days,
                                                       'test': 'test', 'photos': range(10),
                                                       })
 

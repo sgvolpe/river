@@ -1,7 +1,7 @@
 {% extends 'ota/base.html' %}
 {% load static %}
 {% block title %}
-    <title>Shop</title>
+    <title>Dragonfly Travel</title>
 {% endblock %}
 {% block content %}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -14,19 +14,14 @@
             {% include 'ota/search_box.html' %}
         </div>
         <div class="row sgv_divider"></div>
-
-        <div class="row">
-            <div class="card"></div>
-            <div class="card"></div>
-            <div class="card"></div>
-        </div>
         <div class="row sgv_divider"></div>
         <div class="row">
             {% include 'ota/carrousel.html' %}
         </div>
         <div class="row sgv_divider"></div>
-        <div class="row" style="height:250px">
-            <div class="col">
+        <div class="container">
+        <div class="row">
+            <div class="col card sgv_panel">
                 <h4>Promotions</h4>
                 {% for promo in promotions %}
                     <div class="row">
@@ -34,7 +29,7 @@
                     </div>
                 {% endfor %}
             </div>
-            <div class="col">
+            <div class="col card sgv_panel">
                 <div class="row">
                     <h4>Most Popular</h4>
                 </div>
@@ -44,10 +39,21 @@
                     </div>
                 {% endfor%}
             </div>
-            <div class="col"><h4>Us</h4></div>
+            <div class="col card sgv_panel">
+                <h4>Trending</h4>
+                {% for search in trending_7days %}
+                     <div class="row">
+                        {{search.origins}} - {{search.destinations}}
+                    </div>
+                {% endfor%}
+            </div>
 
-        </div>
+        </div></div>
+        <div class="row" style="">
+        <div class="col" style="">
         {% include 'ota/_footer.html'%}
+        </div>
+        </div>
     </div>
 
 {% endblock %}
